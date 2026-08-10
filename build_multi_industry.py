@@ -8,10 +8,13 @@
 import pandas as pd
 import json
 import os
+import re
+from datetime import datetime
 from collections import Counter
 
 EXCEL_PATH = "/Users/krystalcao/Desktop/爆品数据-最新.xlsx"
 FOOD_EXCEL_PATH = "/Users/krystalcao/Desktop/食品饮料.xlsx"
+BEAUTY_EXCEL_PATH = "/Users/krystalcao/Desktop/美护.xlsx"
 
 # 二级行业归类映射（合并过小的类目）
 INDUSTRY_MERGE = {
@@ -369,7 +372,7 @@ def build_multi_html(industries_data):
       font-size: 16px;
     }}
 
-    /* 类目分布卡片（可点击切换） */
+    /* 类目分布卡片（可点击切换 = 兼具 Tab 功能） */
     .dist-card {{
       transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
     }}
@@ -414,6 +417,7 @@ def build_multi_html(industries_data):
       display: none !important;
       transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     }}
+    .folder-content.folder-show,
     .folder-content.active {{
       display: block !important;
       opacity: 1 !important;
@@ -449,21 +453,10 @@ def build_multi_html(industries_data):
         font-size: 11px !important;
       }}
 
-      /* 行业海报缩小 */
-      .industry-poster-mobile {{
-        padding: 25px 18px !important;
-      }}
-
-      /* 分布看板：flex-wrap + 缩小 */
+      /* 分布看板：移动端缩小 */
       .dist-board-mobile > div {{
-        min-width: 80px !important;
-        padding: 8px 6px !important;
-      }}
-      .dist-board-mobile > div > div:first-child {{
-        font-size: 16px !important;
-      }}
-      .dist-board-mobile > div > div:nth-child(2) {{
-        font-size: 10px !important;
+        min-width: 72px !important;
+        padding: 6px 6px !important;
       }}
 
       /* 行业Tab文字缩小 */
@@ -482,12 +475,12 @@ def build_multi_html(industries_data):
 
       /* 卡片内部：图片和文字调整 */
       .product-card-mobile .card-image {{
-        width: 60px !important;
-        height: 60px !important;
+        width: 120px !important;
+        height: 120px !important;
       }}
       .product-card-mobile .card-noimage {{
-        width: 60px !important;
-        height: 60px !important;
+        width: 120px !important;
+        height: 120px !important;
       }}
 
       /* 洞察卡片：单列 */
@@ -521,12 +514,8 @@ def build_multi_html(industries_data):
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
       
-      <div style="display: inline-block; background-color: rgba(255, 255, 255, 0.12); color: #e2e8f0; font-size: 12px; font-weight: bold; letter-spacing: 3px; padding: 5px 16px; border-radius: 20px; margin-bottom: 14px; text-transform: uppercase;">
-        🔥 全行业 · 爆款视频链路监控
-      </div>
-      
       <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px;">
-        多行业爆品选品总览
+        商消pdd爆品榜单
       </h1>
       <div style="width: 60px; height: 3px; background-color: #f59e0b; margin: 18px auto 12px auto; border-radius: 2px;"></div>
       <p style="margin: 0; font-size: 13px; color: #94a3b8;">
@@ -545,6 +534,12 @@ def build_multi_html(industries_data):
   <!-- 行业内容区域 -->
   <div style="max-width: 1200px; margin: 0 auto;">
 {all_contents}
+  </div>
+
+  <!-- 图片放大查看模态层 -->
+  <div id="image-modal" onclick="closeImageModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.85); z-index: 99999; cursor: zoom-out; align-items: center; justify-content: center; padding: 30px; box-sizing: border-box;">
+    <img id="image-modal-img" src="" alt="放大图" style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background-color: #fff;" />
+    <div style="position: absolute; top: 20px; right: 30px; color: #fff; font-size: 14px; background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 20px; pointer-events: none;">✕ 点击任意处关闭</div>
   </div>
 
   <script>
@@ -572,38 +567,38 @@ def build_multi_html(industries_data):
       }}
     }}
 
-    // 品类切换（在每个行业内）
+    // 品类切换（点击分布看板的卡片）
     function switchCategory(indPrefix, idx) {{
       const container = document.getElementById('industry-content-' + indPrefix);
       if (!container) return;
-      
+
+      // 1) 切换品类内容显示
       const contents = container.querySelectorAll('.folder-content');
       contents.forEach(c => {{
-        c.classList.remove('active');
+        c.classList.remove('active', 'folder-show');
         c.style.display = 'none';
       }});
 
       const target = document.getElementById('tab-content-' + indPrefix + '-' + idx);
       if (target) {{
-        target.classList.add('active');
+        target.classList.add('folder-show');
         target.style.display = 'block';
       }}
 
-      // 重置所有"分布卡片"为非激活态
+      // 2) 重置所有"分布卡片"为非激活态
       const distCards = container.querySelectorAll('.dist-card');
       distCards.forEach(card => {{
         card.classList.remove('active-dist-card');
         card.style.backgroundColor = '#faf9f5';
         card.style.borderColor = '#eeebe3';
         card.style.boxShadow = 'none';
-        // 数字颜色恢复
         const numEl = card.querySelector('.dist-card-num');
         if (numEl) {{
           numEl.style.color = card.getAttribute('data-color-text') || '#1b3d22';
         }}
       }});
 
-      // 激活当前点击的"分布卡片"
+      // 3) 激活当前点击的"分布卡片"
       const activeCard = document.getElementById('tab-header-' + indPrefix + '-' + idx);
       if (activeCard) {{
         const colorDeep = activeCard.getAttribute('data-color-deep') || '#1b3d22';
@@ -614,15 +609,35 @@ def build_multi_html(industries_data):
         activeCard.style.borderColor = colorDeep;
         activeCard.style.borderWidth = '1.5px';
         activeCard.style.boxShadow = '0 2px 8px ' + shadow;
-        // 数字加深色
         const numEl = activeCard.querySelector('.dist-card-num');
         if (numEl) {{
           numEl.style.color = colorDeep;
         }}
-        // 平滑滚动到卡片可见位置
         activeCard.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
       }}
     }}
+
+    // 图片放大查看
+    function showImageModal(src, event) {{
+      event.stopPropagation();
+      const modal = document.getElementById('image-modal');
+      const img = document.getElementById('image-modal-img');
+      img.src = src;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }}
+    function closeImageModal() {{
+      const modal = document.getElementById('image-modal');
+      if (modal.style.display !== 'none') {{
+        modal.style.display = 'none';
+        document.getElementById('image-modal-img').src = '';
+        document.body.style.overflow = '';
+      }}
+    }}
+    // ESC 关闭
+    document.addEventListener('keydown', function(e) {{
+      if (e.key === 'Escape' || e.keyCode === 27) closeImageModal();
+    }});
   </script>
 </body>
 </html>'''
@@ -642,48 +657,47 @@ def build_product_card(item, cat_emoji, colors):
     c_light = colors["color_light"]
     
     if image_url:
-        # onerror 时把 img 隐藏，同时显示后面预置的 NO IMAGE 占位 div
+        # onerror 时把 img 隐藏，同时显示后面预置的 NO IMAGE 占位 div（高度自适应右侧总高度）
+        # 图片支持点击放大：cursor: zoom-in + onclick 触发 showImageModal
         image_html = (
-            f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid #edebe5;" '
+            f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
+            f'onclick="showImageModal(this.src, event)" '
             f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
-            f'<div class="card-noimage" style="width: 75px; height: 75px; border-radius: 8px; background: linear-gradient(135deg, #f0eee3 0%, #dfdcce 100%); display: none; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; color: #7a766c;">'
-            f'<span style="font-size: 20px;">{cat_emoji}</span>'
-            f'<span style="font-size: 8px; font-weight: bold; margin-top: 2px; color: #9a968c;">NO IMAGE</span>'
+            f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, #f0eee3 0%, #dfdcce 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: #7a766c;">'
+            f'<span style="font-size: 32px;">{cat_emoji}</span>'
+            f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; color: #9a968c;">NO IMAGE</span>'
             f'</div>'
         )
     else:
-        image_html = f'<div class="card-noimage" style="width: 75px; height: 75px; border-radius: 8px; background: linear-gradient(135deg, #f0eee3 0%, #dfdcce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; color: #7a766c;"><span style="font-size: 20px;">{cat_emoji}</span><span style="font-size: 8px; font-weight: bold; margin-top: 2px; color: #9a968c;">NO IMAGE</span></div>'
+        image_html = f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, #f0eee3 0%, #dfdcce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7a766c;"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; color: #9a968c;">NO IMAGE</span></div>'
     
     tags_html_parts = []
     for tag in tags:
         tags_html_parts.append(f'<span style="background-color: {c_light}; color: {c_text}; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-right: 4px; font-weight: 500;">{tag}</span>')
-    tags_html_parts.append(f'<span style="background-color: #f1eff5; color: #7b68ee; font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 500;">{source}</span>')
     tags_html = "".join(tags_html_parts)
     
     name_escaped = name.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     
     return f'''    <!-- 商品卡片 -->
-    <div class="product-card-mobile" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s ease, box-shadow 0.2s ease;">
-      <div>
-        <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
-          {image_html}
-          <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
-            <div style="font-size: 13px; font-weight: 700; color: #2d2a26; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4;" title="{name_escaped}">
-              {name}
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 2px; margin-top: 2px;">
-              {tags_html}
-            </div>
+    <div class="product-card-mobile" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+      {image_html}
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; justify-content: space-between;">
+        <div>
+          <div style="display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 4px;">
+            {tags_html}
+          </div>
+          <div style="font-size: 13px; font-weight: 700; color: #2d2a26; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4;" title="{name_escaped}">
+            {name}
           </div>
         </div>
-        <div style="background-color: #fdfcf7; border-left: 2px solid #ff8c00; padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #5a5651; font-style: italic; margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 30px;" title="{copy_escaped}">
+        <div style="background-color: #fdfcf7; border-left: 2px solid #ff8c00; padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #5a5651; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
           "{copy_text}"
         </div>
-      </div>
-      <div style="display: flex; gap: 6px; margin-top: auto;">
-        <a href="{video_link}" target="_blank" style="flex: 1; text-align: center; background-color: #ff8c00; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(255,140,0,0.1); border: 1px solid #ff8c00;">🎬 播放视频</a>
-        <a href="{link}" target="_blank" style="flex: 1; text-align: center; background-color: {c_text}; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px {colors['shadow_color']}; border: 1px solid {c_text};">🔗 直达链路</a>
+        <div style="display: flex; gap: 6px;">
+          <a href="{video_link}" target="_blank" style="flex: 1; text-align: center; background-color: #ff8c00; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(255,140,0,0.1); border: 1px solid #ff8c00;">🎬 播放视频</a>
+          <a href="{link}" target="_blank" style="flex: 1; text-align: center; background-color: {c_text}; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px {colors['shadow_color']}; border: 1px solid {c_text};">🔗 直达链路</a>
+        </div>
       </div>
     </div>'''
 
@@ -698,7 +712,7 @@ def build_industry_content(ind, ind_idx, is_first):
     c = ind  # colors 就在 ind 里（INDUSTRY_CONFIG 的值）
     
     active_cls = 'active' if is_first else ''
-    
+
     # 分布看板（每张卡片本身可点击切换品类 = 兼具 Tab 功能）
     dist_cards = []
     for cat_i, cat in enumerate(categories):
@@ -710,29 +724,29 @@ def build_industry_content(ind, ind_idx, is_first):
         else:
             card_style = 'background-color: #faf9f5; border: 1px solid #eeebe3;'
             num_color = c["color_text"]
-        dist_cards.append(f'''      <div id="tab-header-{ind_idx}-{cat_i}" onclick="switchCategory({ind_idx},{cat_i})" data-color-deep="{c["color_deep"]}" data-color-text="{c["color_text"]}" data-color-bg="{c["color_bg"]}" data-shadow="{c["shadow_color"]}" class="dist-card" style="flex: 1; min-width: 110px; {card_style} border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: {'0 2px 8px ' + c["shadow_color"] if is_first_cat else 'none'};" onmouseover="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#fff';this.style.borderColor='{c["color_text"]}';this.style.boxShadow='0 2px 8px {c["shadow_color"]}';}}" onmouseout="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}}">
-        <div style="font-size: 18px; margin-bottom: 4px;">{cat["emoji"]}</div>
-        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{cat["name"]}</div>
-        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: {num_color}; margin-top: 2px;">{cat["count"]}<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
-        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">{cat["percentage"]}</div>
+        dist_cards.append(f'''      <div id="tab-header-{ind_idx}-{cat_i}" onclick="switchCategory({ind_idx},{cat_i})" data-color-deep="{c["color_deep"]}" data-color-text="{c["color_text"]}" data-color-bg="{c["color_bg"]}" data-shadow="{c["shadow_color"]}" class="dist-card" style="flex: 1; min-width: 100px; {card_style} border-radius: 8px; padding: 8px 10px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: {'0 2px 8px ' + c["shadow_color"] if is_first_cat else 'none'};" onmouseover="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#fff';this.style.borderColor='{c["color_text"]}';this.style.boxShadow='0 2px 8px {c["shadow_color"]}';}}" onmouseout="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}}">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 3px; white-space: nowrap; overflow: hidden;">
+          <span style="font-size: 14px;">{cat["emoji"]}</span>
+          <span style="font-size: 11px; color: #5c5a56; font-weight: 500; overflow: hidden; text-overflow: ellipsis;">{cat["name"]}</span>
+        </div>
+        <div style="font-size: 12px; color: {num_color}; font-weight: bold; white-space: nowrap;"><span class="dist-card-num" style="font-weight: bold;">{cat["count"]}</span><span style="font-size: 9px; font-weight: normal; color: #9c9995; margin: 0 3px;">款</span><span style="font-size: 9px; font-weight: normal; color: #9c9995;">{cat["percentage"]}</span></div>
       </div>''')
     dist_html = "\n".join(dist_cards)
-    
-    tab_headers = []  # 不再用底部 Tab 条，分布卡片本身就是 Tab
 
-    # 商品展示（每个品类的内容）
+    # 商品展示（每个品类直接平铺显示）
     tab_contents = []
     for cat_i, cat in enumerate(categories):
-        is_first_cat = (cat_i == 0)
         # 商品卡片
         cards = []
         for item in cat.get("products", []):
             cards.append(build_product_card(item, cat["emoji"], c))
         cards_html = "\n".join(cards)
 
-        content_cls = 'folder-content active' if is_first_cat else 'folder-content'
-        tab_contents.append(f'''    <div id="tab-content-{ind_idx}-{cat_i}" class="{content_cls}">
-  <div style="margin-top: 30px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
+        # 品类之间的 margin-top 统一
+        top_margin = '1px'
+        show_cls = 'folder-show' if cat_i == 0 else ''
+        tab_contents.append(f'''    <div id="tab-content-{ind_idx}-{cat_i}" class="folder-content {show_cls}">
+  <div style="margin-top: {top_margin}; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
     <div style="font-size: 18px; font-weight: bold; color: {c["color_dark"]}; display: flex; align-items: center; gap: 8px;">
       <span style="font-size: 22px;">{cat["emoji"]}</span> {cat["name"]}
       <span style="background-color: #eae7e0; color: #5c5a56; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: normal; margin-left: 6px;">{cat["count"]} 款爆品</span>
@@ -743,8 +757,7 @@ def build_industry_content(ind, ind_idx, is_first):
 {cards_html}
   </div>
 </div>''')
-    
-    tabs_html = "\n".join(tab_headers)
+
     contents_html = "\n\n".join(tab_contents)
     
     # 高频词
@@ -770,28 +783,7 @@ def build_industry_content(ind, ind_idx, is_first):
     
     return f'''  <div id="industry-content-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
-    <!-- 顶部海报 -->
-    <div style="max-width: 1180px; margin: 0 auto; background-color: #fbfaf5; padding: 25px 30px; border-radius: 0 0 20px 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.06); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #2d2a26; line-height: 1.6;">
-    
-    <div class="industry-poster-mobile" style="background: linear-gradient(135deg, {c["color"]} 0%, {c["color_dark"]} 100%); color: #ffffff; border-radius: 16px; padding: 40px 30px; text-align: center; margin-bottom: 25px; box-shadow: 0 8px 24px {c["shadow_color"]}; position: relative; overflow: hidden;">
-      <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
-      <div style="position: absolute; bottom: -60px; left: -60px; width: 180px; height: 180px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
-      
-      <div style="display: inline-block; background-color: rgba(255, 255, 255, 0.15); color: #f4fbf7; font-size: 11px; font-weight: bold; letter-spacing: 2px; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase;">
-        🔥 {ind["name"]} · 爆款视频链路监控
-      </div>
-      
-      <h2 style="margin: 8px 0 0 0; font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.75); letter-spacing: 0.5px;">
-        {ind["name"]}行业 · 近期数据精选
-      </h2>
-      <div style="width: 50px; height: 3px; background-color: #ff8c00; margin: 20px auto 15px auto; border-radius: 2px;"></div>
-      <p style="margin: 0; font-size: 12px; color: rgba(255,255,255,0.6);">
-        精确去重后唯一爆品总数: <strong style="color: #fff; font-size: 14px;">{total}</strong> 款
-        {f' | 引流平台: {platform_html}' if platform_html else ''}
-      </p>
-    </div>
-
-    <!-- 爆品类目分布看板（每张卡片可点击切换品类） -->
+    <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
     <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
       <h3 style="margin: 0 0 15px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
         📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（点击卡片切换品类 ↓）</span>
@@ -812,8 +804,6 @@ def build_industry_content(ind, ind_idx, is_first):
         <div>💡 长图使用提示：支持在任何兼容 HTML 渲染的阅读器中直接预览。</div>
         <div style="margin-top: 4px;">由 CID 专项爆款分析助手精心制作 | {ind["name"]}行业 · 数据日期 2026-08</div>
       </div>
-    </div>
-
     </div>
 
     <!-- 爆品创意黄金法则与高频词 -->
@@ -848,27 +838,8 @@ def build_empty_industry_content(ind, ind_idx, is_first):
     c = ind  # colors
     return f'''  <div id="industry-content-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
-    <div style="max-width: 1180px; margin: 0 auto; background-color: #fbfaf5; padding: 25px 30px; border-radius: 0 0 20px 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.06); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #2d2a26; line-height: 1.6;">
-    
-    <div class="industry-poster-mobile" style="background: linear-gradient(135deg, {c["color"]} 0%, {c["color_dark"]} 100%); color: #ffffff; border-radius: 16px; padding: 40px 30px; text-align: center; margin-bottom: 25px; box-shadow: 0 8px 24px {c["shadow_color"]}; position: relative; overflow: hidden;">
-      <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
-      <div style="position: absolute; bottom: -60px; left: -60px; width: 180px; height: 180px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
-      
-      <div style="display: inline-block; background-color: rgba(255, 255, 255, 0.15); color: #f4fbf7; font-size: 11px; font-weight: bold; letter-spacing: 2px; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase;">
-        🔥 {ind["name"]} · 爆款视频链路监控
-      </div>
-      
-      <h2 style="margin: 8px 0 0 0; font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.75); letter-spacing: 0.5px;">
-        {ind["name"]}行业 · 数据待补充
-      </h2>
-      <div style="width: 50px; height: 3px; background-color: #ff8c00; margin: 20px auto 15px auto; border-radius: 2px;"></div>
-      <p style="margin: 0; font-size: 12px; color: rgba(255,255,255,0.6);">
-        暂无数据，敬请期待
-      </p>
-    </div>
-
     <!-- 空状态占位 -->
-    <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
       <div style="font-size: 64px; margin-bottom: 20px;">{c["emoji"]}</div>
       <h3 style="margin: 0 0 10px 0; font-size: 18px; color: {c["color_text"]}; font-weight: 600;">
         {ind["name"]}行业数据即将上线
@@ -879,9 +850,388 @@ def build_empty_industry_content(ind, ind_idx, is_first):
       </p>
     </div>
 
-    </div>
-
   </div>'''
+
+
+def build_versioned_html(industries_data, version_label, new_version_html, history_versions):
+    """将所有版本（历史+当前）合并为带版本筛选器的最终HTML"""
+    
+    # 构建版本列表：当前版本排最前面
+    all_versions = [(version_label, new_version_html)] + history_versions
+    
+    # 当前HTML已经包含完整结构（head/body/script），需要提取body内的核心内容
+    # 从new_version_html中提取body内容（剔除已有的顶部海报框，避免和外层版本海报框重复）
+    body_match = re.search(r'<body[^>]*>(.*)</body>', new_version_html, re.DOTALL)
+    if body_match:
+        current_body = body_match.group(1)
+        # 剔除 build_multi_html 自带的顶部总览海报框（避免双框）
+        current_body = re.sub(r'<!-- 顶部总览海报 -->.*?</div>\s*</div>', '', current_body, count=1, flags=re.DOTALL)
+    else:
+        current_body = new_version_html
+    
+    # 从new_version_html中提取head/style/script
+    head_match = re.search(r'<head>(.*?)</head>', new_version_html, re.DOTALL)
+    head_content = head_match.group(1) if head_match else ""
+    
+    # 提取所有script
+    script_match = re.search(r'<script>(.*?)</script>', new_version_html, re.DOTALL)
+    scripts = script_match.group(1) if script_match else ""
+    
+    # 构建版本选择器HTML
+    version_options = []
+    for label, _ in all_versions:
+        version_options.append(f'          <option value="{label}">{label}</option>')
+    version_select_html = '\n'.join(version_options)
+    
+    # 构建所有版本内容
+    version_blocks = []
+    for label, html_content in all_versions:
+        if label == version_label:
+            body = current_body
+        else:
+            # 历史版本：从完整HTML中提取body（同时剔除顶部海报框）
+            bm = re.search(r'<body[^>]*>(.*)</body>', html_content, re.DOTALL)
+            if bm:
+                body = bm.group(1)
+                body = re.sub(r'<!-- 顶部总览海报 -->.*?</div>\s*</div>', '', body, count=1, flags=re.DOTALL)
+            else:
+                body = html_content
+        version_blocks.append(f'    <!-- VERSION_START: {label} -->\n    <div id="version-{label.replace(" ", "-")}" class="version-block" style="display: {"block" if label == version_label else "none"}; width: 100%;">\n{body}\n    </div>\n    <!-- VERSION_END -->')
+    all_versions_html = '\n'.join(version_blocks)
+    
+    html = f'''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多行业爆品选品报告</title>
+  <style>
+    * {{ box-sizing: border-box; }}
+    body {{
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px 0;
+      background-color: #f3f7f4;
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(210,30%,96%,1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(210,20%,92%,1) 0px, transparent 50%);
+    }}
+    .min-h-screen {{ min-height: 100vh; }}
+    .text-slate-800 {{ color: #1e293b; }}
+    .antialiased {{ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }}
+    .pb-16 {{ padding-bottom: 4rem; }}
+    .flex {{ display: flex; }}
+    .items-end {{ align-items: flex-end; }}
+    .items-center {{ align-items: center; }}
+    .overflow-x-auto {{ overflow-x: auto; }}
+    .gap-2 {{ gap: 0.5rem; }}
+    .gap-1\\.5 {{ gap: 0.375rem; }}
+    .pl-2 {{ padding-left: 0.5rem; }}
+    .px-5 {{ padding-left: 1.25rem; padding-right: 1.25rem; }}
+    .px-6 {{ padding-left: 1.5rem; padding-right: 1.5rem; }}
+    .py-3 {{ padding-top: 0.75rem; padding-bottom: 0.75rem; }}
+    .text-xs {{ font-size: 0.75rem; }}
+    .text-sm {{ font-size: 0.875rem; }}
+    .md\\:text-base {{ font-size: 1rem; }}
+    .md\\:text-sm {{ font-size: 0.875rem; }}
+    .font-black {{ font-weight: 900; }}
+    .cursor-pointer {{ cursor: pointer; }}
+    .select-none {{ user-select: none; }}
+    .transition-all {{ transition: all 0.3s; }}
+    .duration-300 {{ transition-duration: 0.3s; }}
+    .bg-white {{ background-color: #ffffff; }}
+    .rounded-2xl {{ border-radius: 1rem; }}
+    .rounded-tl-none {{ border-top-left-radius: 0; }}
+    .p-5 {{ padding: 1.25rem; }}
+    .md\\:p-6 {{ padding: 1.5rem; }}
+    .shadow-xl {{ box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }}
+    .relative {{ position: relative; }}
+    .min-h-\\[400px\\] {{ min-height: 400px; }}
+    .no-scrollbar {{
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }}
+    .no-scrollbar::-webkit-scrollbar {{
+      display: none;
+    }}
+
+    /* 版本筛选器 */
+    .version-selector {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    .version-selector select {{
+      appearance: none;
+      -webkit-appearance: none;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 36px 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      min-width: 160px;
+    }}
+    .version-selector select:hover {{
+      border-color: #94a3b8;
+    }}
+    .version-selector select:focus {{
+      border-color: #1e293b;
+      box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
+    }}
+
+    /* 行业级 Tab */
+    .industry-tab {{
+      position: relative;
+      background: #ffffff;
+      border-radius: 16px 16px 0 0;
+      border: 2px solid rgba(0,0,0,0.06);
+      border-bottom: none;
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #94a3b8;
+      font-size: 15px;
+    }}
+
+    .active-industry-tab {{
+      background: #1e293b !important;
+      color: #ffffff !important;
+      border-color: #1e293b !important;
+      box-shadow: 0 -6px 16px rgba(30,41,59,0.12);
+      z-index: 10;
+      font-size: 16px;
+    }}
+
+    /* 类目分布卡片 */
+    .dist-card {{
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }}
+    .dist-card:hover {{
+      transform: translateY(-2px);
+    }}
+    .dist-card.active-dist-card {{
+      transform: translateY(-2px);
+    }}
+
+    .active-tab {{
+      background: #1b3d22 !important;
+      color: #ffffff !important;
+      border-color: #1b3d22 !important;
+      box-shadow: 0 -4px 10px rgba(27,61,34,0.08);
+      z-index: 10;
+    }}
+
+    .industry-content {{
+      opacity: 0 !important;
+      transform: translateY(10px) !important;
+      display: none !important;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }}
+    .industry-content.active {{
+      display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }}
+
+    .folder-content {{
+      opacity: 0 !important;
+      transform: translateY(10px) scale(0.99) !important;
+      display: none !important;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }}
+    .folder-content.folder-show,
+    .folder-content.active {{
+      display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) scale(1) !important;
+    }}
+
+    .text-forest {{ color: #1b3d22; }}
+    .bg-forest {{ background-color: #1b3d22; }}
+    .border-forest {{ border-color: #1b3d22; }}
+    ::selection {{ background-color: #dbeafe; color: #1e3a5f; }}
+
+    @media (max-width: 768px) {{
+      body {{
+        padding: 8px 0;
+      }}
+      .product-card-mobile {{
+        width: 100% !important;
+        min-width: 0 !important;
+      }}
+      .top-poster-mobile {{
+        padding: 20px 15px !important;
+      }}
+      .top-poster-mobile h1 {{
+        font-size: 16px !important;
+      }}
+      .dist-board-mobile {{
+        gap: 6px !important;
+      }}
+      .industry-tab {{
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+      }}
+      .active-industry-tab {{
+        font-size: 11px !important;
+      }}
+      .version-selector select {{
+        min-width: 130px;
+        font-size: 12px;
+        padding: 6px 30px 6px 10px;
+      }}
+    }}
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased pb-16">
+
+  <!-- 顶部总览海报（含版本筛选器） -->
+  <div style="max-width: 1200px; margin: 0 auto 20px auto; padding: 0 10px;">
+    <div class="top-poster-mobile" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #ffffff; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 12px 40px rgba(30,41,59,0.15); position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+      <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+      
+      <!-- 版本筛选器（右上角） -->
+      <div style="position: absolute; top: 16px; right: 20px; z-index: 1;">
+        <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; font-weight: 600; color: #e2e8f0; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 10px center; outline: none; min-width: 140px; transition: background 0.2s;">
+{version_select_html}
+        </select>
+      </div>
+      
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px;">
+        商消pdd爆品榜单
+      </h1>
+      <div style="width: 60px; height: 3px; background-color: #f59e0b; margin: 18px auto 12px auto; border-radius: 2px;"></div>
+      <p style="margin: 0; font-size: 13px; color: #94a3b8;">
+        覆盖 {len([i for i in industries_data if i["total"] > 0])} 个行业 · 总计 <strong style="color: #fff; font-size: 15px;">{sum(i["total"] for i in industries_data)}</strong> 款爆品
+      </p>
+    </div>
+  </div>
+
+  <!-- 所有版本的内容块 -->
+{all_versions_html}
+
+  <!-- 图片放大查看模态层 -->
+  <div id="image-modal" onclick="closeImageModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.85); z-index: 99999; cursor: zoom-out; align-items: center; justify-content: center; padding: 30px; box-sizing: border-box;">
+    <img id="image-modal-img" src="" alt="放大图" style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background-color: #fff;" />
+    <div style="position: absolute; top: 20px; right: 30px; color: #fff; font-size: 14px; background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 20px; pointer-events: none;">✕ 点击任意处关闭</div>
+  </div>
+
+  <script>
+    // 版本切换
+    function switchVersion(label) {{
+      const blocks = document.querySelectorAll('.version-block');
+      blocks.forEach(b => b.style.display = 'none');
+      const target = document.getElementById('version-' + label.replace(/\\s/g, '-'));
+      if (target) {{
+        target.style.display = 'block';
+      }}
+    }}
+
+    // 行业切换
+    function switchIndustry(idx) {{
+      const contents = document.querySelectorAll('.industry-content');
+      contents.forEach(c => {{
+        c.classList.remove('active');
+        c.style.display = 'none';
+      }});
+
+      const target = document.getElementById('industry-content-' + idx);
+      if (target) {{
+        target.classList.add('active');
+        target.style.display = 'block';
+      }}
+
+      const tabs = document.querySelectorAll('.industry-tab');
+      tabs.forEach(t => t.classList.remove('active-industry-tab'));
+
+      const activeTab = document.getElementById('industry-tab-' + idx);
+      if (activeTab) {{
+        activeTab.classList.add('active-industry-tab');
+        activeTab.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
+      }}
+    }}
+
+    // 品类切换
+    function switchCategory(indPrefix, idx) {{
+      const container = document.getElementById('industry-content-' + indPrefix);
+      if (!container) return;
+
+      const contents = container.querySelectorAll('.folder-content');
+      contents.forEach(c => {{
+        c.classList.remove('active', 'folder-show');
+        c.style.display = 'none';
+      }});
+
+      const target = document.getElementById('tab-content-' + indPrefix + '-' + idx);
+      if (target) {{
+        target.classList.add('folder-show');
+        target.style.display = 'block';
+      }}
+
+      const distCards = container.querySelectorAll('.dist-card');
+      distCards.forEach(card => {{
+        card.classList.remove('active-dist-card');
+        card.style.backgroundColor = '#faf9f5';
+        card.style.borderColor = '#eeebe3';
+        card.style.boxShadow = 'none';
+        const numEl = card.querySelector('.dist-card-num');
+        if (numEl) {{
+          numEl.style.color = card.getAttribute('data-color-text') || '#1b3d22';
+        }}
+      }});
+
+      // 3) 激活当前点击的"分布卡片"
+      const activeCard = document.getElementById('tab-header-' + indPrefix + '-' + idx);
+      if (activeCard) {{
+        const colorDeep = activeCard.getAttribute('data-color-deep') || '#1b3d22';
+        const colorBg = activeCard.getAttribute('data-color-bg') || '#faf9f5';
+        const shadow = activeCard.getAttribute('data-shadow') || 'rgba(27,61,34,0.08)';
+        activeCard.classList.add('active-dist-card');
+        activeCard.style.backgroundColor = colorBg;
+        activeCard.style.borderColor = colorDeep;
+        activeCard.style.borderWidth = '1.5px';
+        activeCard.style.boxShadow = '0 2px 8px ' + shadow;
+        const numEl = activeCard.querySelector('.dist-card-num');
+        if (numEl) {{
+          numEl.style.color = colorDeep;
+        }}
+        activeCard.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
+      }}
+    }}
+
+    // 图片放大
+    function showImageModal(src, event) {{
+      event.stopPropagation();
+      const modal = document.getElementById('image-modal');
+      const modalImg = document.getElementById('image-modal-img');
+      modal.style.display = 'flex';
+      modalImg.src = src;
+      document.body.style.overflow = 'hidden';
+    }}
+
+    function closeImageModal() {{
+      const modal = document.getElementById('image-modal');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }}
+
+    document.addEventListener('keydown', function(e) {{
+      if (e.key === 'Escape') {{
+        closeImageModal();
+      }}
+    }});
+  </script>
+</body>
+</html>'''
+    return html
 
 
 def main():
@@ -892,6 +1242,14 @@ def main():
         print(f"  处理: {sheet_name}")
         if sheet_name == "食品饮料":
             df = pd.read_excel(FOOD_EXCEL_PATH)
+            if df.empty:
+                df = None
+            else:
+                merge_map = INDUSTRY_MERGE.get(sheet_name, {})
+                if merge_map:
+                    df["投放二级行业"] = df["投放二级行业"].apply(lambda x: merge_map.get(x, x))
+        elif sheet_name == "美护":
+            df = pd.read_excel(BEAUTY_EXCEL_PATH)
             if df.empty:
                 df = None
             else:
@@ -925,18 +1283,39 @@ def main():
         industries_data.append(ind_data)
         print(f"    {ind_data['total']}款, {len(ind_data['categories'])}个类目")
     
-    print("🔨 生成HTML...")
-    html = build_multi_html(industries_data)
+    # 今天日期作为版本标签
+    today = datetime.now()
+    version_label = f"{today.month}月{today.day}日更新"
     
+    # 读取已有HTML中的历史版本数据
     output_dir = "/Users/krystalcao/Desktop/已完成"
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "多行业爆品选品报告.html")
     
+    history_versions = []  # [(label, html_content_section)]
+    if os.path.exists(output_path):
+        with open(output_path, "r", encoding="utf-8") as f:
+            old_html = f.read()
+        # 提取旧版本信息：<!-- VERSION_START: label --> 到 <!-- VERSION_END -->
+        pattern = r'<!-- VERSION_START: (.*?) -->(.*?)<!-- VERSION_END -->'
+        matches = re.findall(pattern, old_html, re.DOTALL)
+        for label, content in matches:
+            if label != version_label:  # 避免重复
+                history_versions.append((label, content.strip()))
+    
+    print("🔨 生成HTML...")
+    # 当前版本的内容
+    new_version_html = build_multi_html(industries_data)
+    
+    # 合并所有版本生成最终HTML
+    final_html = build_versioned_html(industries_data, version_label, new_version_html, history_versions)
+    
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html)
+        f.write(final_html)
     
     file_size = os.path.getsize(output_path)
     print(f"✅ 报告已生成: {output_path}")
+    print(f"   版本: {version_label}")
     print(f"   文件大小: {file_size/1024:.1f} KB")
     print(f"   总爆品数: {sum(i['total'] for i in industries_data)}")
 
