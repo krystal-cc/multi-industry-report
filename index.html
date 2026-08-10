@@ -21866,13 +21866,13 @@
       const contents = document.querySelectorAll('.industry-content');
       contents.forEach(c => {
         c.classList.remove('active');
-        c.style.display = 'none';
+        c.style.setProperty('display', 'none', 'important');
       });
 
       const target = document.getElementById('industry-content-' + idx);
       if (target) {
         target.classList.add('active');
-        target.style.display = 'block';
+        target.style.setProperty('display', 'block', 'important');
       }
 
       const tabs = document.querySelectorAll('.industry-tab');
@@ -21893,13 +21893,13 @@
       const contents = container.querySelectorAll('.folder-content');
       contents.forEach(c => {
         c.classList.remove('active');
-        c.style.display = 'none';
+        c.style.setProperty('display', 'none', 'important');
       });
 
       const target = document.getElementById('tab-content-' + indPrefix + '-' + idx);
       if (target) {
         target.classList.add('active');
-        target.style.display = 'block';
+        target.style.setProperty('display', 'block', 'important');
       }
 
       const tabs = container.querySelectorAll('.folder-tab');
