@@ -369,15 +369,15 @@ def build_multi_html(industries_data):
       font-size: 16px;
     }}
 
-    /* 品类级 Tab */
-    .folder-tab {{
-      position: relative;
-      background: #ffffff;
-      border-radius: 12px 12px 0 0;
-      border: 1px solid rgba(27,61,34,0.1);
-      border-bottom: none;
-      white-space: nowrap;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 类目分布卡片（可点击切换） */
+    .dist-card {{
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }}
+    .dist-card:hover {{
+      transform: translateY(-2px);
+    }}
+    .dist-card.active-dist-card {{
+      transform: translateY(-2px);
     }}
 
     .active-tab {{
@@ -466,12 +466,6 @@ def build_multi_html(industries_data):
         font-size: 10px !important;
       }}
 
-      /* 品类Tab文字缩小 */
-      .folder-tab {{
-        font-size: 11px !important;
-        padding: 8px 10px !important;
-      }}
-
       /* 行业Tab文字缩小 */
       .industry-tab {{
         font-size: 12px !important;
@@ -509,10 +503,6 @@ def build_multi_html(industries_data):
 
     @media (max-width: 480px) {{
       /* 更小屏幕进一步缩小 */
-      .folder-tab {{
-        font-size: 10px !important;
-        padding: 6px 8px !important;
-      }}
       .industry-tab {{
         font-size: 11px !important;
         padding: 6px 10px !important;
@@ -599,39 +589,38 @@ def build_multi_html(industries_data):
         target.style.display = 'block';
       }}
 
-      const tabs = container.querySelectorAll('.folder-tab');
-      tabs.forEach(t => {{
-        t.style.background = '#fff';
-        t.style.color = '#94a3b8';
-        t.style.borderColor = 'rgba(27,61,34,0.1)';
-        t.style.boxShadow = 'none';
-        t.style.zIndex = '0';
-        // 重置 tab-count / tab-pct 样式（非激活态）
-        const cnt = t.querySelector('.tab-count');
-        if (cnt) {{
-          cnt.style.backgroundColor = '#faf9f5';
-          cnt.style.color = (t.getAttribute('data-color-text') || '#1b3d22');
-          cnt.style.borderColor = '#eeebe3';
+      // 重置所有"分布卡片"为非激活态
+      const distCards = container.querySelectorAll('.dist-card');
+      distCards.forEach(card => {{
+        card.classList.remove('active-dist-card');
+        card.style.backgroundColor = '#faf9f5';
+        card.style.borderColor = '#eeebe3';
+        card.style.boxShadow = 'none';
+        // 数字颜色恢复
+        const numEl = card.querySelector('.dist-card-num');
+        if (numEl) {{
+          numEl.style.color = card.getAttribute('data-color-text') || '#1b3d22';
         }}
       }});
 
-      const activeTab = document.getElementById('tab-header-' + indPrefix + '-' + idx);
-      if (activeTab) {{
-        const colorDeep = activeTab.getAttribute('data-color-deep') || '#1b3d22';
-        const shadow = activeTab.getAttribute('data-shadow') || 'rgba(27,61,34,0.08)';
-        activeTab.style.background = colorDeep;
-        activeTab.style.color = '#ffffff';
-        activeTab.style.borderColor = colorDeep;
-        activeTab.style.boxShadow = '0 -4px 10px ' + shadow;
-        activeTab.style.zIndex = '10';
-        // 激活态 tab-count 改用白色高亮
-        const cnt = activeTab.querySelector('.tab-count');
-        if (cnt) {{
-          cnt.style.backgroundColor = 'rgba(255,255,255,0.25)';
-          cnt.style.color = '#ffffff';
-          cnt.style.borderColor = 'rgba(255,255,255,0.35)';
+      // 激活当前点击的"分布卡片"
+      const activeCard = document.getElementById('tab-header-' + indPrefix + '-' + idx);
+      if (activeCard) {{
+        const colorDeep = activeCard.getAttribute('data-color-deep') || '#1b3d22';
+        const colorBg = activeCard.getAttribute('data-color-bg') || '#faf9f5';
+        const shadow = activeCard.getAttribute('data-shadow') || 'rgba(27,61,34,0.08)';
+        activeCard.classList.add('active-dist-card');
+        activeCard.style.backgroundColor = colorBg;
+        activeCard.style.borderColor = colorDeep;
+        activeCard.style.borderWidth = '1.5px';
+        activeCard.style.boxShadow = '0 2px 8px ' + shadow;
+        // 数字加深色
+        const numEl = activeCard.querySelector('.dist-card-num');
+        if (numEl) {{
+          numEl.style.color = colorDeep;
         }}
-        activeTab.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
+        // 平滑滚动到卡片可见位置
+        activeCard.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
       }}
     }}
   </script>
@@ -710,31 +699,37 @@ def build_industry_content(ind, ind_idx, is_first):
     
     active_cls = 'active' if is_first else ''
     
-    # 品类Tab（同时充当类目分布看板：显示数量+占比）
-    tab_headers = []
+    # 分布看板（每张卡片本身可点击切换品类 = 兼具 Tab 功能）
+    dist_cards = []
+    for cat_i, cat in enumerate(categories):
+        is_first_cat = (cat_i == 0)
+        # 激活态：行业主色描边 + 浅色背景；非激活：默认米色
+        if is_first_cat:
+            card_style = f'background-color: {c["color_bg"]}; border: 1.5px solid {c["color_deep"]};'
+            num_color = c["color_deep"]
+        else:
+            card_style = 'background-color: #faf9f5; border: 1px solid #eeebe3;'
+            num_color = c["color_text"]
+        dist_cards.append(f'''      <div id="tab-header-{ind_idx}-{cat_i}" onclick="switchCategory({ind_idx},{cat_i})" data-color-deep="{c["color_deep"]}" data-color-text="{c["color_text"]}" data-color-bg="{c["color_bg"]}" data-shadow="{c["shadow_color"]}" class="dist-card" style="flex: 1; min-width: 110px; {card_style} border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: {'0 2px 8px ' + c["shadow_color"] if is_first_cat else 'none'};" onmouseover="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#fff';this.style.borderColor='{c["color_text"]}';this.style.boxShadow='0 2px 8px {c["shadow_color"]}';}}" onmouseout="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}}">
+        <div style="font-size: 18px; margin-bottom: 4px;">{cat["emoji"]}</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{cat["name"]}</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: {num_color}; margin-top: 2px;">{cat["count"]}<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">{cat["percentage"]}</div>
+      </div>''')
+    dist_html = "\n".join(dist_cards)
+    
+    tab_headers = []  # 不再用底部 Tab 条，分布卡片本身就是 Tab
+
+    # 商品展示（每个品类的内容）
     tab_contents = []
     for cat_i, cat in enumerate(categories):
         is_first_cat = (cat_i == 0)
-        # 激活态用行业深色，非激活态用灰色
-        if is_first_cat:
-            tab_style = f'background:{c["color_deep"]}!important;color:#fff!important;border-color:{c["color_deep"]}!important;box-shadow:0 -4px 10px {c["shadow_color"]};z-index:10'
-        else:
-            tab_style = 'color:#94a3b8;background:#fff'
-        tab_headers.append(f'''    <div id="tab-header-{ind_idx}-{cat_i}" onclick="switchCategory({ind_idx},{cat_i})" data-color-deep="{c["color_deep"]}" data-shadow="{c["shadow_color"]}" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="{tab_style}">
-      <span style="font-size: 14px;">{cat["emoji"]}</span>
-      <span>{cat["name"]}</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: {'rgba(255,255,255,0.25)' if is_first_cat else '#faf9f5'}; color: {'#fff' if is_first_cat else c["color_text"]}; border: 1px solid {'rgba(255,255,255,0.35)' if is_first_cat else '#eeebe3'};">
-        <span style="font-size: 12px; font-weight: 800;">{cat["count"]}</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">{cat["percentage"]}</span>
-    </div>''')
-        
         # 商品卡片
         cards = []
         for item in cat.get("products", []):
             cards.append(build_product_card(item, cat["emoji"], c))
         cards_html = "\n".join(cards)
-        
+
         content_cls = 'folder-content active' if is_first_cat else 'folder-content'
         tab_contents.append(f'''    <div id="tab-content-{ind_idx}-{cat_i}" class="{content_cls}">
   <div style="margin-top: 30px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
@@ -796,13 +791,19 @@ def build_industry_content(ind, ind_idx, is_first):
       </p>
     </div>
 
-    <!-- 品类 Tab 切换（兼具类目分布看板：每个Tab显示该品类数量与占比） -->
-    <div style="margin: 30px 0 0 0;">
-      <div class="flex items-end overflow-x-auto no-scrollbar gap-1.5 pl-2 select-none" id="category-tabs-container-{ind_idx}">
-{tabs_html}
+    <!-- 爆品类目分布看板（每张卡片可点击切换品类） -->
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（点击卡片切换品类 ↓）</span>
+      </h3>
+      <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
+{dist_html}
       </div>
+    </div>
 
-      <div class="category-content-box bg-white rounded-2xl rounded-tl-none p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid {c["color_border"]};">
+    <!-- 品类商品展示区 -->
+    <div style="margin-top: 25px;">
+      <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid {c["color_border"]};">
 {contents_html}
       </div>
 

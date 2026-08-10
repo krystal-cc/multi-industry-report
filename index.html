@@ -77,15 +77,15 @@
       font-size: 16px;
     }
 
-    /* 品类级 Tab */
-    .folder-tab {
-      position: relative;
-      background: #ffffff;
-      border-radius: 12px 12px 0 0;
-      border: 1px solid rgba(27,61,34,0.1);
-      border-bottom: none;
-      white-space: nowrap;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 类目分布卡片（可点击切换） */
+    .dist-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .dist-card:hover {
+      transform: translateY(-2px);
+    }
+    .dist-card.active-dist-card {
+      transform: translateY(-2px);
     }
 
     .active-tab {
@@ -174,12 +174,6 @@
         font-size: 10px !important;
       }
 
-      /* 品类Tab文字缩小 */
-      .folder-tab {
-        font-size: 11px !important;
-        padding: 8px 10px !important;
-      }
-
       /* 行业Tab文字缩小 */
       .industry-tab {
         font-size: 12px !important;
@@ -217,10 +211,6 @@
 
     @media (max-width: 480px) {
       /* 更小屏幕进一步缩小 */
-      .folder-tab {
-        font-size: 10px !important;
-        padding: 6px 8px !important;
-      }
       .industry-tab {
         font-size: 11px !important;
         padding: 6px 10px !important;
@@ -296,100 +286,84 @@
       </p>
     </div>
 
-    <!-- 品类 Tab 切换（兼具类目分布看板：每个Tab显示该品类数量与占比） -->
-    <div style="margin: 30px 0 0 0;">
-      <div class="flex items-end overflow-x-auto no-scrollbar gap-1.5 pl-2 select-none" id="category-tabs-container-0">
-    <div id="tab-header-0-0" onclick="switchCategory(0,0)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="background:#1b6e3a!important;color:#fff!important;border-color:#1b6e3a!important;box-shadow:0 -4px 10px rgba(39,174,96,0.15);z-index:10">
-      <span style="font-size: 14px;">🐾</span>
-      <span>宠物相关</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: rgba(255,255,255,0.25); color: #fff; border: 1px solid rgba(255,255,255,0.35);">
-        <span style="font-size: 12px; font-weight: 800;">154</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">51.9%</span>
-    </div>
-    <div id="tab-header-0-1" onclick="switchCategory(0,1)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🌾</span>
-      <span>粮油干货</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">41</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">13.8%</span>
-    </div>
-    <div id="tab-header-0-2" onclick="switchCategory(0,2)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">💊</span>
-      <span>海外膳食营养品</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">39</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">13.1%</span>
-    </div>
-    <div id="tab-header-0-3" onclick="switchCategory(0,3)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">💪</span>
-      <span>膳食营养品</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">18</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">6.1%</span>
-    </div>
-    <div id="tab-header-0-4" onclick="switchCategory(0,4)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🍪</span>
-      <span>休闲食品</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">13</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">4.4%</span>
-    </div>
-    <div id="tab-header-0-5" onclick="switchCategory(0,5)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🍯</span>
-      <span>传统滋补</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">9</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">3.0%</span>
-    </div>
-    <div id="tab-header-0-6" onclick="switchCategory(0,6)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🍵</span>
-      <span>茶叶</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">8</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">2.7%</span>
-    </div>
-    <div id="tab-header-0-7" onclick="switchCategory(0,7)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🍓</span>
-      <span>水果蔬菜</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">5</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">1.7%</span>
-    </div>
-    <div id="tab-header-0-8" onclick="switchCategory(0,8)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🥤</span>
-      <span>水饮冲调</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">5</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">1.7%</span>
-    </div>
-    <div id="tab-header-0-9" onclick="switchCategory(0,9)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🍶</span>
-      <span>酒类</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">2</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">0.7%</span>
-    </div>
-    <div id="tab-header-0-10" onclick="switchCategory(0,10)" data-color-deep="#1b6e3a" data-shadow="rgba(39,174,96,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">📦</span>
-      <span>其他</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #426b50; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">3</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">1.0%</span>
-    </div>
+    <!-- 爆品类目分布看板（每张卡片可点击切换品类） -->
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: #426b50; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（点击卡片切换品类 ↓）</span>
+      </h3>
+      <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <div id="tab-header-0-0" onclick="switchCategory(0,0)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #f2f7f3; border: 1.5px solid #1b6e3a; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 8px rgba(39,174,96,0.15);" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🐾</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">宠物相关</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #1b6e3a; margin-top: 2px;">154<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">51.9%</div>
       </div>
+      <div id="tab-header-0-1" onclick="switchCategory(0,1)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🌾</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">粮油干货</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">41<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">13.8%</div>
+      </div>
+      <div id="tab-header-0-2" onclick="switchCategory(0,2)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">💊</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">海外膳食营养品</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">39<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">13.1%</div>
+      </div>
+      <div id="tab-header-0-3" onclick="switchCategory(0,3)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">💪</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">膳食营养品</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">18<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">6.1%</div>
+      </div>
+      <div id="tab-header-0-4" onclick="switchCategory(0,4)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🍪</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">休闲食品</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">13<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">4.4%</div>
+      </div>
+      <div id="tab-header-0-5" onclick="switchCategory(0,5)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🍯</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">传统滋补</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">9<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">3.0%</div>
+      </div>
+      <div id="tab-header-0-6" onclick="switchCategory(0,6)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🍵</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">茶叶</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">8<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">2.7%</div>
+      </div>
+      <div id="tab-header-0-7" onclick="switchCategory(0,7)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🍓</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">水果蔬菜</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">5<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">1.7%</div>
+      </div>
+      <div id="tab-header-0-8" onclick="switchCategory(0,8)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🥤</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">水饮冲调</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">5<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">1.7%</div>
+      </div>
+      <div id="tab-header-0-9" onclick="switchCategory(0,9)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🍶</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">酒类</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">2<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">0.7%</div>
+      </div>
+      <div id="tab-header-0-10" onclick="switchCategory(0,10)" data-color-deep="#1b6e3a" data-color-text="#426b50" data-color-bg="#f2f7f3" data-shadow="rgba(39,174,96,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#426b50';this.style.boxShadow='0 2px 8px rgba(39,174,96,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">📦</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">其他</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #426b50; margin-top: 2px;">3<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">1.0%</div>
+      </div>
+      </div>
+    </div>
 
-      <div class="category-content-box bg-white rounded-2xl rounded-tl-none p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid #dbe6e0;">
+    <!-- 品类商品展示区 -->
+    <div style="margin-top: 25px;">
+      <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid #dbe6e0;">
     <div id="tab-content-0-0" class="folder-content active">
   <div style="margin-top: 30px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
     <div style="font-size: 18px; font-weight: bold; color: #1e8449; display: flex; align-items: center; gap: 8px;">
@@ -7428,140 +7402,114 @@
       </p>
     </div>
 
-    <!-- 品类 Tab 切换（兼具类目分布看板：每个Tab显示该品类数量与占比） -->
-    <div style="margin: 30px 0 0 0;">
-      <div class="flex items-end overflow-x-auto no-scrollbar gap-1.5 pl-2 select-none" id="category-tabs-container-1">
-    <div id="tab-header-1-0" onclick="switchCategory(1,0)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="background:#2471a3!important;color:#fff!important;border-color:#2471a3!important;box-shadow:0 -4px 10px rgba(52,152,219,0.15);z-index:10">
-      <span style="font-size: 14px;">🌀</span>
-      <span>环境电器</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: rgba(255,255,255,0.25); color: #fff; border: 1px solid rgba(255,255,255,0.35);">
-        <span style="font-size: 12px; font-weight: 800;">46</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">11.5%</span>
-    </div>
-    <div id="tab-header-1-1" onclick="switchCategory(1,1)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🔨</span>
-      <span>家装建材</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">42</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">10.5%</span>
-    </div>
-    <div id="tab-header-1-2" onclick="switchCategory(1,2)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🍳</span>
-      <span>厨具</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">41</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">10.2%</span>
-    </div>
-    <div id="tab-header-1-3" onclick="switchCategory(1,3)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🔌</span>
-      <span>厨房电器</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">40</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">10.0%</span>
-    </div>
-    <div id="tab-header-1-4" onclick="switchCategory(1,4)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">📺</span>
-      <span>大家电</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">30</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">7.5%</span>
-    </div>
-    <div id="tab-header-1-5" onclick="switchCategory(1,5)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🔧</span>
-      <span>五金/工具</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">26</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">6.5%</span>
-    </div>
-    <div id="tab-header-1-6" onclick="switchCategory(1,6)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">💇</span>
-      <span>个护健康电器</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">22</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">5.5%</span>
-    </div>
-    <div id="tab-header-1-7" onclick="switchCategory(1,7)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🖼️</span>
-      <span>居家饰品</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">19</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">4.8%</span>
-    </div>
-    <div id="tab-header-1-8" onclick="switchCategory(1,8)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">📱</span>
-      <span>手机及配件</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">18</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">4.5%</span>
-    </div>
-    <div id="tab-header-1-9" onclick="switchCategory(1,9)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🔋</span>
-      <span>电器配件</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">17</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">4.2%</span>
-    </div>
-    <div id="tab-header-1-10" onclick="switchCategory(1,10)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🧵</span>
-      <span>居家布艺</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">14</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">3.5%</span>
-    </div>
-    <div id="tab-header-1-11" onclick="switchCategory(1,11)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">📦</span>
-      <span>收纳整理工具</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">12</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">3.0%</span>
-    </div>
-    <div id="tab-header-1-12" onclick="switchCategory(1,12)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🔥</span>
-      <span>火机烟具</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">10</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">2.5%</span>
-    </div>
-    <div id="tab-header-1-13" onclick="switchCategory(1,13)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🛏️</span>
-      <span>床上用品</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">9</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">2.2%</span>
-    </div>
-    <div id="tab-header-1-14" onclick="switchCategory(1,14)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🧹</span>
-      <span>家务工具</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">8</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">2.0%</span>
-    </div>
-    <div id="tab-header-1-15" onclick="switchCategory(1,15)" data-color-deep="#2471a3" data-shadow="rgba(52,152,219,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">📦</span>
-      <span>其他</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #2980b9; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">46</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">11.5%</span>
-    </div>
+    <!-- 爆品类目分布看板（每张卡片可点击切换品类） -->
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: #2980b9; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（点击卡片切换品类 ↓）</span>
+      </h3>
+      <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <div id="tab-header-1-0" onclick="switchCategory(1,0)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #f4f9fd; border: 1.5px solid #2471a3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 8px rgba(52,152,219,0.15);" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🌀</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">环境电器</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2471a3; margin-top: 2px;">46<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">11.5%</div>
       </div>
+      <div id="tab-header-1-1" onclick="switchCategory(1,1)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🔨</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">家装建材</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">42<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">10.5%</div>
+      </div>
+      <div id="tab-header-1-2" onclick="switchCategory(1,2)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🍳</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">厨具</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">41<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">10.2%</div>
+      </div>
+      <div id="tab-header-1-3" onclick="switchCategory(1,3)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🔌</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">厨房电器</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">40<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">10.0%</div>
+      </div>
+      <div id="tab-header-1-4" onclick="switchCategory(1,4)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">📺</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">大家电</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">30<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">7.5%</div>
+      </div>
+      <div id="tab-header-1-5" onclick="switchCategory(1,5)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🔧</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">五金/工具</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">26<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">6.5%</div>
+      </div>
+      <div id="tab-header-1-6" onclick="switchCategory(1,6)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">💇</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">个护健康电器</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">22<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">5.5%</div>
+      </div>
+      <div id="tab-header-1-7" onclick="switchCategory(1,7)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🖼️</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">居家饰品</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">19<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">4.8%</div>
+      </div>
+      <div id="tab-header-1-8" onclick="switchCategory(1,8)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">📱</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">手机及配件</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">18<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">4.5%</div>
+      </div>
+      <div id="tab-header-1-9" onclick="switchCategory(1,9)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🔋</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">电器配件</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">17<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">4.2%</div>
+      </div>
+      <div id="tab-header-1-10" onclick="switchCategory(1,10)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🧵</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">居家布艺</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">14<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">3.5%</div>
+      </div>
+      <div id="tab-header-1-11" onclick="switchCategory(1,11)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">📦</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">收纳整理工具</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">12<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">3.0%</div>
+      </div>
+      <div id="tab-header-1-12" onclick="switchCategory(1,12)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🔥</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">火机烟具</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">10<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">2.5%</div>
+      </div>
+      <div id="tab-header-1-13" onclick="switchCategory(1,13)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🛏️</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">床上用品</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">9<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">2.2%</div>
+      </div>
+      <div id="tab-header-1-14" onclick="switchCategory(1,14)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🧹</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">家务工具</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">8<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">2.0%</div>
+      </div>
+      <div id="tab-header-1-15" onclick="switchCategory(1,15)" data-color-deep="#2471a3" data-color-text="#2980b9" data-color-bg="#f4f9fd" data-shadow="rgba(52,152,219,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#2980b9';this.style.boxShadow='0 2px 8px rgba(52,152,219,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">📦</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">其他</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #2980b9; margin-top: 2px;">46<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">11.5%</div>
+      </div>
+      </div>
+    </div>
 
-      <div class="category-content-box bg-white rounded-2xl rounded-tl-none p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid #d4e6f9;">
+    <!-- 品类商品展示区 -->
+    <div style="margin-top: 25px;">
+      <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid #d4e6f9;">
     <div id="tab-content-1-0" class="folder-content active">
   <div style="margin-top: 30px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
     <div style="font-size: 18px; font-weight: bold; color: #2980b9; display: flex; align-items: center; gap: 8px;">
@@ -17027,76 +16975,66 @@
       </p>
     </div>
 
-    <!-- 品类 Tab 切换（兼具类目分布看板：每个Tab显示该品类数量与占比） -->
-    <div style="margin: 30px 0 0 0;">
-      <div class="flex items-end overflow-x-auto no-scrollbar gap-1.5 pl-2 select-none" id="category-tabs-container-2">
-    <div id="tab-header-2-0" onclick="switchCategory(2,0)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="background:#a93226!important;color:#fff!important;border-color:#a93226!important;box-shadow:0 -4px 10px rgba(231,76,60,0.15);z-index:10">
-      <span style="font-size: 14px;">💍</span>
-      <span>时尚饰品</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: rgba(255,255,255,0.25); color: #fff; border: 1px solid rgba(255,255,255,0.35);">
-        <span style="font-size: 12px; font-weight: 800;">94</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">47.0%</span>
-    </div>
-    <div id="tab-header-2-1" onclick="switchCategory(2,1)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">🩲</span>
-      <span>内衣</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">26</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">13.0%</span>
-    </div>
-    <div id="tab-header-2-2" onclick="switchCategory(2,2)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">👔</span>
-      <span>男装</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">22</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">11.0%</span>
-    </div>
-    <div id="tab-header-2-3" onclick="switchCategory(2,3)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">⌚</span>
-      <span>钟表眼镜</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">18</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">9.0%</span>
-    </div>
-    <div id="tab-header-2-4" onclick="switchCategory(2,4)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">👞</span>
-      <span>男鞋</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">15</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">7.5%</span>
-    </div>
-    <div id="tab-header-2-5" onclick="switchCategory(2,5)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">👗</span>
-      <span>女装</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">11</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">5.5%</span>
-    </div>
-    <div id="tab-header-2-6" onclick="switchCategory(2,6)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">👜</span>
-      <span>箱包</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">4</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">2.0%</span>
-    </div>
-    <div id="tab-header-2-7" onclick="switchCategory(2,7)" data-color-deep="#a93226" data-shadow="rgba(231,76,60,0.15)" class="folder-tab px-4 py-2.5 text-xs md:text-sm font-black flex items-center gap-1.5 cursor-pointer select-none transition-all duration-300" style="color:#94a3b8;background:#fff">
-      <span style="font-size: 14px;">📦</span>
-      <span>其他</span>
-      <span class="tab-count" style="display: inline-flex; align-items: baseline; gap: 1px; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.4; background-color: #faf9f5; color: #c0392b; border: 1px solid #eeebe3;">
-        <span style="font-size: 12px; font-weight: 800;">10</span><span style="font-size: 8px; opacity: 0.85;">款</span>
-      </span>
-      <span class="tab-pct" style="font-size: 9px; opacity: 0.75; font-weight: 600; margin-left: -2px;">5.0%</span>
-    </div>
+    <!-- 爆品类目分布看板（每张卡片可点击切换品类） -->
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: #c0392b; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（点击卡片切换品类 ↓）</span>
+      </h3>
+      <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <div id="tab-header-2-0" onclick="switchCategory(2,0)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #fef9f9; border: 1.5px solid #a93226; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 8px rgba(231,76,60,0.15);" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">💍</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">时尚饰品</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #a93226; margin-top: 2px;">94<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">47.0%</div>
       </div>
+      <div id="tab-header-2-1" onclick="switchCategory(2,1)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">🩲</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">内衣</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">26<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">13.0%</div>
+      </div>
+      <div id="tab-header-2-2" onclick="switchCategory(2,2)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">👔</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">男装</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">22<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">11.0%</div>
+      </div>
+      <div id="tab-header-2-3" onclick="switchCategory(2,3)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">⌚</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">钟表眼镜</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">18<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">9.0%</div>
+      </div>
+      <div id="tab-header-2-4" onclick="switchCategory(2,4)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">👞</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">男鞋</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">15<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">7.5%</div>
+      </div>
+      <div id="tab-header-2-5" onclick="switchCategory(2,5)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">👗</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">女装</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">11<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">5.5%</div>
+      </div>
+      <div id="tab-header-2-6" onclick="switchCategory(2,6)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">👜</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">箱包</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">4<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">2.0%</div>
+      </div>
+      <div id="tab-header-2-7" onclick="switchCategory(2,7)" data-color-deep="#a93226" data-color-text="#c0392b" data-color-bg="#fef9f9" data-shadow="rgba(231,76,60,0.15)" class="dist-card" style="flex: 1; min-width: 110px; background-color: #faf9f5; border: 1px solid #eeebe3; border-radius: 8px; padding: 10px 12px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: none;" onmouseover="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#fff';this.style.borderColor='#c0392b';this.style.boxShadow='0 2px 8px rgba(231,76,60,0.15)';}" onmouseout="if(!this.classList.contains('active-dist-card')){this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}">
+        <div style="font-size: 18px; margin-bottom: 4px;">📦</div>
+        <div style="font-size: 11px; color: #73706c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">其他</div>
+        <div class="dist-card-num" style="font-size: 15px; font-weight: bold; color: #c0392b; margin-top: 2px;">10<span style="font-size: 9px; font-weight: normal; color: #9c9995; margin-left: 2px;">款</span></div>
+        <div style="font-size: 9px; color: #9c9995; margin-top: 1px;">5.0%</div>
+      </div>
+      </div>
+    </div>
 
-      <div class="category-content-box bg-white rounded-2xl rounded-tl-none p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid #f5d6d6;">
+    <!-- 品类商品展示区 -->
+    <div style="margin-top: 25px;">
+      <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid #f5d6d6;">
     <div id="tab-content-2-0" class="folder-content active">
   <div style="margin-top: 30px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
     <div style="font-size: 18px; font-weight: bold; color: #c0392b; display: flex; align-items: center; gap: 8px;">
@@ -21923,39 +21861,38 @@
         target.style.display = 'block';
       }
 
-      const tabs = container.querySelectorAll('.folder-tab');
-      tabs.forEach(t => {
-        t.style.background = '#fff';
-        t.style.color = '#94a3b8';
-        t.style.borderColor = 'rgba(27,61,34,0.1)';
-        t.style.boxShadow = 'none';
-        t.style.zIndex = '0';
-        // 重置 tab-count / tab-pct 样式（非激活态）
-        const cnt = t.querySelector('.tab-count');
-        if (cnt) {
-          cnt.style.backgroundColor = '#faf9f5';
-          cnt.style.color = (t.getAttribute('data-color-text') || '#1b3d22');
-          cnt.style.borderColor = '#eeebe3';
+      // 重置所有"分布卡片"为非激活态
+      const distCards = container.querySelectorAll('.dist-card');
+      distCards.forEach(card => {
+        card.classList.remove('active-dist-card');
+        card.style.backgroundColor = '#faf9f5';
+        card.style.borderColor = '#eeebe3';
+        card.style.boxShadow = 'none';
+        // 数字颜色恢复
+        const numEl = card.querySelector('.dist-card-num');
+        if (numEl) {
+          numEl.style.color = card.getAttribute('data-color-text') || '#1b3d22';
         }
       });
 
-      const activeTab = document.getElementById('tab-header-' + indPrefix + '-' + idx);
-      if (activeTab) {
-        const colorDeep = activeTab.getAttribute('data-color-deep') || '#1b3d22';
-        const shadow = activeTab.getAttribute('data-shadow') || 'rgba(27,61,34,0.08)';
-        activeTab.style.background = colorDeep;
-        activeTab.style.color = '#ffffff';
-        activeTab.style.borderColor = colorDeep;
-        activeTab.style.boxShadow = '0 -4px 10px ' + shadow;
-        activeTab.style.zIndex = '10';
-        // 激活态 tab-count 改用白色高亮
-        const cnt = activeTab.querySelector('.tab-count');
-        if (cnt) {
-          cnt.style.backgroundColor = 'rgba(255,255,255,0.25)';
-          cnt.style.color = '#ffffff';
-          cnt.style.borderColor = 'rgba(255,255,255,0.35)';
+      // 激活当前点击的"分布卡片"
+      const activeCard = document.getElementById('tab-header-' + indPrefix + '-' + idx);
+      if (activeCard) {
+        const colorDeep = activeCard.getAttribute('data-color-deep') || '#1b3d22';
+        const colorBg = activeCard.getAttribute('data-color-bg') || '#faf9f5';
+        const shadow = activeCard.getAttribute('data-shadow') || 'rgba(27,61,34,0.08)';
+        activeCard.classList.add('active-dist-card');
+        activeCard.style.backgroundColor = colorBg;
+        activeCard.style.borderColor = colorDeep;
+        activeCard.style.borderWidth = '1.5px';
+        activeCard.style.boxShadow = '0 2px 8px ' + shadow;
+        // 数字加深色
+        const numEl = activeCard.querySelector('.dist-card-num');
+        if (numEl) {
+          numEl.style.color = colorDeep;
         }
-        activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        // 平滑滚动到卡片可见位置
+        activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       }
     }
   </script>
