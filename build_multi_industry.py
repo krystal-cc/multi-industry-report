@@ -56,15 +56,15 @@ INDUSTRY_MERGE = {
 INDUSTRY_CONFIG = {
     "服饰": {
         "emoji": "👗",
-        "color": "#e74c3c",           # 海报主色
-        "color_dark": "#c0392b",       # 海报渐变终点、品类标题
-        "color_deep": "#a93226",       # 品类Tab激活背景、品类内容边框
-        "color_text": "#c0392b",       # 分布看板标题/数字、直达链路按钮、高频词
-        "color_light": "#fdf0f0",      # 标签浅色背景
-        "color_bg": "#fef9f9",         # 高频词浅色背景
-        "color_border": "#f5d6d6",     # 高频词边框
-        "color_btn_hover": "#a93226",  # 按钮深色
-        "shadow_color": "rgba(231,76,60,0.15)",
+        "color": "#d97706",           # 琥珀金
+        "color_dark": "#b45309",       # 深琥珀
+        "color_deep": "#92400e",       # 深棕
+        "color_text": "#b45309",       # 文字/数字
+        "color_light": "#fff7ed",      # 极浅暖橙
+        "color_bg": "#fffbeb",         # 暖黄底
+        "color_border": "#fed7aa",     # 浅暖橙边框
+        "color_btn_hover": "#78350f",  # 深棕
+        "shadow_color": "rgba(217,119,6,0.15)",
     },
     "消电日百": {
         "emoji": "🏠",
