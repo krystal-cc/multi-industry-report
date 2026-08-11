@@ -711,12 +711,12 @@ def build_product_card(item, cat_emoji, colors):
             {name}
           </div>
         </div>
-        <div style="background-color: #fdfcf7; border-left: 2px solid #ff8c00; padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #5a5651; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
+        <div style="background-color: #f7faf7; border-left: 2px solid #10b981; padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #5a5651; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
           "{copy_text}"
         </div>
         <div style="display: flex; gap: 6px;">
-          <a href="{video_link}" target="_blank" class="btn-visit" style="flex: 1; text-align: center; background-color: #ff8c00; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; justify-content: center; box-shadow: 0 2px 4px rgba(255,140,0,0.1); border: 1px solid #ff8c00;">🎬 播放视频</a>
-          <a href="{link}" target="_blank" class="btn-visit" style="flex: 1; text-align: center; background-color: {c_text}; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; justify-content: center; box-shadow: 0 2px 4px {colors['shadow_color']}; border: 1px solid {c_text};">🔗 直达链路</a>
+          <a href="{video_link}" target="_blank" class="btn-visit btn-video"><span class="btn-emoji">🎬</span> 播放视频</a>
+          <a href="{link}" target="_blank" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>
         </div>
       </div>
     </div>'''
@@ -1126,7 +1126,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       50% {{ background-position: 100% 50%; }}
     }}
 
-    /* 按钮悬浮效果 */
+    /* 按钮基础样式 - 浅色系 */
     .btn-visit {{
       display: inline-flex;
       align-items: center;
@@ -1138,11 +1138,43 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       cursor: pointer;
       transition: all 0.2s ease;
       text-decoration: none;
+      flex: 1;
+      text-align: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
     }}
-    .btn-visit:hover {{
+    /* 播放视频按钮 - 浅橙主题 */
+    .btn-video {{
+      background-color: #fff4e6;
+      color: #ea580c;
+      border: 1px solid #fed7aa;
+      box-shadow: 0 1px 2px rgba(234,88,12,0.06);
+    }}
+    .btn-video:hover {{
+      background-color: #ea580c;
+      color: #ffffff;
+      border-color: #ea580c;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 12px rgba(234,88,12,0.25);
     }}
+    .btn-video:hover .btn-emoji {{ filter: brightness(0) invert(1); }}
+    .btn-emoji {{ transition: filter 0.2s ease; }}
+    /* 直达链路按钮 - 浅绿主题 */
+    .btn-link {{
+      background-color: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      box-shadow: 0 1px 2px rgba(4,120,87,0.06);
+    }}
+    .btn-link:hover {{
+      background-color: #047857;
+      color: #ffffff;
+      border-color: #047857;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(4,120,87,0.25);
+    }}
+    .btn-link:hover .btn-emoji {{ filter: brightness(0) invert(1); }}
 
     /* 商品标题行高优化 */
     .product-title {{
