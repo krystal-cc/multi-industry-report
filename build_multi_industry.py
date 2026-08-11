@@ -1315,8 +1315,12 @@ def main():
         pattern = r'<!-- VERSION_START: (.*?) -->(.*?)<!-- VERSION_END -->'
         matches = re.findall(pattern, old_html, re.DOTALL)
         for label, content in matches:
-            if label != version_label:  # 避免重复
-                history_versions.append((label, content.strip()))
+            if label == version_label:  # 避免重复
+                continue
+            # 跳过空内容的历史版本（如数据缺失时生成的版本）
+            if "8月10日更新" in label:
+                continue
+            history_versions.append((label, content.strip()))
     
     print("🔨 生成HTML...")
     # 当前版本的内容
