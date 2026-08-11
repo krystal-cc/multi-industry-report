@@ -56,15 +56,15 @@ INDUSTRY_MERGE = {
 INDUSTRY_CONFIG = {
     "服饰": {
         "emoji": "👗",
-        "color": "#d97706",           # 琥珀金
-        "color_dark": "#b45309",       # 深琥珀
-        "color_deep": "#92400e",       # 深棕
-        "color_text": "#b45309",       # 文字/数字
-        "color_light": "#fff7ed",      # 极浅暖橙
-        "color_bg": "#fffbeb",         # 暖黄底
-        "color_border": "#fed7aa",     # 浅暖橙边框
-        "color_btn_hover": "#78350f",  # 深棕
-        "shadow_color": "rgba(217,119,6,0.15)",
+        "color": "#c49a6c",           # 柔和暖棕
+        "color_dark": "#a77b52",       # 深暖棕
+        "color_deep": "#8b6540",       # 深咖
+        "color_text": "#a77b52",       # 文字/数字
+        "color_light": "#fdf6f0",      # 极浅米色
+        "color_bg": "#fefaf6",         # 暖白底
+        "color_border": "#e8cfb3",     # 浅暖咖边框
+        "color_btn_hover": "#6b4a2c",  # 深咖
+        "shadow_color": "rgba(180,140,100,0.15)",
     },
     "消电日百": {
         "emoji": "🏠",
@@ -92,15 +92,15 @@ INDUSTRY_CONFIG = {
     },
     "美护": {
         "emoji": "💄",
-        "color": "#e91e63",
-        "color_dark": "#c2185b",
-        "color_deep": "#ad1457",
-        "color_text": "#c2185b",
-        "color_light": "#fce4ec",
-        "color_bg": "#fef5f7",
-        "color_border": "#f8bbd0",
-        "color_btn_hover": "#880e4f",
-        "shadow_color": "rgba(233,30,99,0.15)",
+        "color": "#d4879a",
+        "color_dark": "#b87080",
+        "color_deep": "#9c5a6a",
+        "color_text": "#b87080",
+        "color_light": "#fdf2f4",
+        "color_bg": "#fef9fa",
+        "color_border": "#f0d0d7",
+        "color_btn_hover": "#7d4252",
+        "shadow_color": "rgba(200,130,150,0.15)",
     },
 }
 
@@ -233,53 +233,192 @@ def extract_keywords(df):
     return [{"word": w, "count": c} for w, c in top if c >= 2]
 
 def get_insights(sheet_name, df):
-    """根据行业数据生成洞察密码"""
-    insights = []
+    """方案A：根据行业数据自动分析生成洞察密码（动态词频分析，不硬编码）"""
     
-    if sheet_name == "服饰":
-        insights = [
-            {"id": 1, "title": "情感化送礼场景", "emoji": "🎁", "color": "#e74c3c",
-             "desc": "文案强调\"送朋友送自己送爱人\"，将饰品与情感场景绑定，七夕、节日送礼是核心转化驱动力。"},
-            {"id": 2, "title": "性价比+工艺卖点", "emoji": "💎", "color": "#c0392b",
-             "desc": "高频出现\"浮雕工艺\"\"活口可调节\"\"高档\"等词，用工艺细节支撑价格，同时强调实惠，降低购买门槛。"},
-            {"id": 3, "title": "视觉冲击+上身效果", "emoji": "✨", "color": "#e67e22",
-             "desc": "\"显身材\"\"像没穿一样\"\"防走光\"等词频出，聚焦穿着效果和解决痛点，用强画面感激发购买欲。"},
-            {"id": 4, "title": "应季+新款驱动", "emoji": "🔥", "color": "#f39c12",
-             "desc": "\"抢新款\"\"2026新款\"是标题标配，利用消费者追新心理，制造紧迫感和稀缺感。"},
-        ]
-    elif sheet_name == "消电日百":
-        insights = [
-            {"id": 1, "title": "懒人经济+解放双手", "emoji": "🤖", "color": "#3498db",
-             "desc": "\"免安装\"\"一键操作\"\"全自动\"\"智能\"高频出现，瞄准懒人经济和便捷生活需求，降低使用门槛。"},
-            {"id": 2, "title": "极致性价比轰炸", "emoji": "💰", "color": "#2980b9",
-             "desc": "\"两位数到手\"\"工厂直销\"\"比实体店便宜一半\"等价格锚点策略，用大牌平替概念击中价格敏感用户。"},
-            {"id": 3, "title": "健康生活升级", "emoji": "🌿", "color": "#27ae60",
-             "desc": "\"除菌\"\"净化\"\"无油烹饪\"\"健康材质\"等卖点突出，后疫情时代消费者对居家环境健康关注度持续走高。"},
-            {"id": 4, "title": "居家场景全覆盖", "emoji": "🏡", "color": "#8e44ad",
-             "desc": "从厨具到收纳、从电器到家装，覆盖居家生活全场景，\"一物多用\"\"多功能\"是提升客单价的关键策略。"},
-        ]
-    elif sheet_name == "美护":
-        insights = [
-            {"id": 1, "title": "美白祛斑是绝对刚需", "emoji": "✨", "color": "#e91e63",
-             "desc": "特殊化妆品类目占比突出，\"淡斑\"\"美白\"\"377\"\"烟酰胺\"是高频词，功效型护肤需求持续爆发。"},
-            {"id": 2, "title": "面部洗护基本盘稳固", "emoji": "🧴", "color": "#9c27b0",
-             "desc": "面部洗护类目数量领先，\"温和\"\"控油\"\"氨基酸\"等成分卖点是转化核心，基础护肤需求稳定。"},
-            {"id": 3, "title": "不满意包退降低决策门槛", "emoji": "🛡️", "color": "#ff5722",
-             "desc": "\"不好用给你退\"\"试用不满意包退\"等零风险承诺，打消消费者对护肤品效果的顾虑。"},
-            {"id": 4, "title": "彩妆香水赛道多元化", "emoji": "💄", "color": "#e040fb",
-             "desc": "面部彩妆、香水香膏、唇部彩妆等类目多点开花，\"持妆\"\"显色\"\"高级感\"是爆款标题标配。"},
-        ]
-    elif sheet_name == "食品饮料":
-        insights = [
-            {"id": 1, "title": "宠物经济大爆发", "emoji": "🐶", "color": "#27ae60",
-             "desc": "宠物生活类目占比近半，\"冻干\"\"无谷\"\"营养\"是核心关键词，宠物主愿意为毛孩子健康买单。"},
-            {"id": 2, "title": "懒人即食+免煮冲泡", "emoji": "⏰", "color": "#2ecc71",
-             "desc": "\"免煮冲泡\"\"开袋即食\"\"方便速食\"仍是食品类爆款密码，快节奏生活下省时是第一需求。"},
-            {"id": 3, "title": "健康养生概念升级", "emoji": "💊", "color": "#f39c12",
-             "desc": "膳食营养品和海外保健品占比高，\"高纯净原料\"\"好吸收\"\"无添加\"是信任转化的关键。"},
-            {"id": 4, "title": "不满意包退信任背书", "emoji": "🛡️", "color": "#e74c3c",
-             "desc": "\"不好吃你随便退\"\"不满意包退\"等零风险承诺是食品饮料转化的最后一把火，极大降低试错成本。"},
-        ]
+    # 合并所有文本用于分析
+    all_names = " ".join(df["商品名称"].dropna().astype(str))
+    all_copy = ""
+    if "创意标题" in df.columns:
+        all_copy = " ".join(df["创意标题"].dropna().astype(str))
+    all_text = all_names + " " + all_copy
+    total_products = len(df)
+    
+    # 类目分布
+    cat_counts = df.groupby("投放二级行业").size().sort_values(ascending=False)
+    top_cats = list(cat_counts.items())
+    
+    # 平台分布
+    plat_counts = {}
+    top_plat_name = ""
+    top_plat_pct = ""
+    if "引流平台" in df.columns:
+        plat_counts = df["引流平台"].value_counts()
+        if len(plat_counts) > 0:
+            top_plat_name = str(plat_counts.index[0])
+            top_plat_pct = f"{plat_counts.iloc[0]/total_products*100:.1f}%"
+    
+    # 主题检测规则（按行业通用+特定行业覆盖）
+    theme_rules = [
+        {
+            "title": "情感送礼场景绑定",
+            "emoji": "🎁", "color": "#e74c3c",
+            "patterns": ["送朋友", "送爱人", "送自己", "礼物", "七夕", "节日", "情人节", "送礼", "生日", "送女友", "送妈妈"],
+            "desc_tpl": "送礼/情感场景关键词累计出现{count}次，\"{top_words}\"等词高频出现，将商品与情感场景绑定是核心转化驱动力。"
+        },
+        {
+            "title": "极致性价比轰炸",
+            "emoji": "💰", "color": "#f39c12",
+            "patterns": ["两位数", "工厂", "直销", "便宜", "实惠", "包邮", "平价", "批发", "源头", "白菜价", "清仓", "亏本", "仅需", "只要", "低至", "起"],
+            "desc_tpl": "\"{top_words}\"等价格锚点话术累计{count}次，用极致性价比降低购买决策门槛。"
+        },
+        {
+            "title": "视觉冲击+穿着效果",
+            "emoji": "✨", "color": "#e67e22",
+            "patterns": ["显身材", "防走光", "像没穿", "上身", "显瘦", "修身", "舒适", "冰丝", "透气", "亲肤", "不闷", "不扎", "裸感", "无痕", "高弹"],
+            "desc_tpl": "\"{top_words}\"等穿着体验词累计{count}次，聚焦上身效果和痛点解决，用强烈画面感激发购买欲。"
+        },
+        {
+            "title": "新款/应季追新",
+            "emoji": "🔥", "color": "#f39c12",
+            "patterns": ["新款", "2026", "限量", "首发", "新品", "爆款", "抢", "手慢无", "库存", "断货"],
+            "desc_tpl": "\"{top_words}\"等追新紧迫词累计{count}次，利用消费者追新和稀缺心理制造购买紧迫感。"
+        },
+        {
+            "title": "懒人便捷+解放双手",
+            "emoji": "⏰", "color": "#2ecc71",
+            "patterns": ["免安装", "一键", "全自动", "免煮", "即食", "冲泡", "方便", "速食", "懒人", "省力", "省时", "快捷", "开袋即食", "免动手", "智能"],
+            "desc_tpl": "\"{top_words}\"等便捷关键词累计{count}次，快节奏生活下\"省时省力\"是爆款第一准则。"
+        },
+        {
+            "title": "健康安全品质升级",
+            "emoji": "🌿", "color": "#27ae60",
+            "patterns": ["除菌", "净化", "无油", "健康", "无添加", "高纯净", "好吸收", "天然", "有机", "零添加", "非油炸", "母婴", "安全"],
+            "desc_tpl": "\"{top_words}\"等健康品质关键词累计{count}次，消费者对健康安全关注度持续走高，品质升级是溢价关键。"
+        },
+        {
+            "title": "多功能一物多用",
+            "emoji": "🏡", "color": "#8e44ad",
+            "patterns": ["多功能", "一物多用", "多用", "两用", "三合一", "多合一", "万能", "百搭"],
+            "desc_tpl": "\"{top_words}\"等多功能标签累计{count}次，一物多用降低用户决策成本，是提升客单价的有效策略。"
+        },
+        {
+            "title": "宠物经济大爆发",
+            "emoji": "🐶", "color": "#27ae60",
+            "patterns": ["冻干", "无谷", "宠物", "猫", "狗", "毛孩子", "猫咪", "狗狗", "猫粮", "狗粮", "猫砂"],
+            "desc_tpl": "宠物相关关键词累计{count}次，\"{top_words}\"是核心卖点，宠物主愿意为毛孩子健康高品质买单。"
+        },
+        {
+            "title": "功效护肤/美白淡斑",
+            "emoji": "✨", "color": "#e91e63",
+            "patterns": ["美白", "淡斑", "祛斑", "烟酰胺", "377", "祛痘", "淡印", "提亮", "去黄", "防晒", "遮瑕"],
+            "desc_tpl": "\"{top_words}\"等功效成分词累计{count}次，功效型护肤需求持续爆发，\"成分硬核\"是护肤爆款核心密码。"
+        },
+        {
+            "title": "成分温和护肤",
+            "emoji": "🧴", "color": "#9c27b0",
+            "patterns": ["氨基酸", "温和", "控油", "玻尿酸", "精华", "水杨酸", "维C", "胶原", "舒缓", "修复", "补水", "保湿", "洁面"],
+            "desc_tpl": "\"{top_words}\"等成分/功效关键词累计{count}次，成分党驱动的精准护肤需求是稳定基本盘。"
+        },
+        {
+            "title": "零风险信任背书",
+            "emoji": "🛡️", "color": "#e74c3c",
+            "patterns": ["不满意包退", "不好吃退", "不好用退", "无理由退", "退换", "包退", "试用不满意", "放心买", "随时退"],
+            "desc_tpl": "零风险承诺话术累计{count}次，\"不满意包退\"是打消疑虑、促成购买转化的最后一把火。"
+        },
+        {
+            "title": "彩妆品质感进阶",
+            "emoji": "💄", "color": "#e040fb",
+            "patterns": ["持妆", "显色", "高级感", "哑光", "水光", "丝绒", "雾面", "不脱妆", "不沾杯", "口红", "唇釉"],
+            "desc_tpl": "\"{top_words}\"等品质感关键词累计{count}次，高级妆效和持妆力是彩妆爆款的标配卖点。"
+        },
+        {
+            "title": "养生滋补升级",
+            "emoji": "💊", "color": "#f39c12",
+            "patterns": ["膳食", "营养", "滋补", "高蛋白", "养生", "调理", "燕窝", "枸杞", "参", "草本", "药食同源", "传统", "煲汤"],
+            "desc_tpl": "\"{top_words}\"等养生滋补词累计{count}次，大健康概念升级，传统滋补赛道持续走热。"
+        },
+        {
+            "title": "工艺/材质安心感",
+            "emoji": "💎", "color": "#c0392b",
+            "patterns": ["浮雕", "活口", "可调节", "纯银", "不锈钢", "高档", "精致", "匠心", "手工", "精工", "真皮"],
+            "desc_tpl": "\"{top_words}\"等工艺材质词累计{count}次，用工艺细节支撑价格，增强信任感和价值感。"
+        },
+    ]
+    
+    # 计算每个主题的得分
+    scored = []
+    for rule in theme_rules:
+        total_count = 0
+        matched_words = []
+        for pat in rule["patterns"]:
+            c = all_text.count(pat)
+            if c > 0:
+                total_count += c
+                matched_words.append((pat, c))
+        if total_count >= 2:
+            matched_words.sort(key=lambda x: x[1], reverse=True)
+            scored.append((total_count, rule, matched_words))
+    
+    # 按得分降序，取前4
+    scored.sort(key=lambda x: x[0], reverse=True)
+    
+    insights = []
+    for i, (score, rule, matched_words) in enumerate(scored[:4]):
+        top_words = "、".join([f'"{w}"' for w, _ in matched_words[:3]])
+        desc = rule["desc_tpl"].format(count=score, top_words=top_words)
+        insights.append({
+            "id": i + 1,
+            "title": rule["title"],
+            "emoji": rule["emoji"],
+            "color": rule["color"],
+            "desc": desc,
+        })
+    
+    # 如果主题不足4个，用数据特征补充
+    idx = len(insights)
+    fallback_pool = []
+    
+    if top_cats and idx < 4:
+        top_cat_name = top_cats[0][0]
+        top_cat_pct = f"{top_cats[0][1]/total_products*100:.1f}%"
+        fallback_pool.append({
+            "title": f"头部类目集中度高",
+            "emoji": "📊", "color": "#3498db",
+            "desc": f"{top_cat_name}类目占比{top_cat_pct}，是{sheet_name}行业绝对主战场，抓住头部类目即抓住大盘。"
+        })
+    
+    if len(cat_counts) >= 4 and idx + len(fallback_pool) < 4:
+        fallback_pool.append({
+            "title": "细分类目百花齐放",
+            "emoji": "🌐", "color": "#9b59b6",
+            "desc": f"共{len(cat_counts)}个二级类目入榜，品类覆盖广泛，选品需精细化运营，挖掘细分蓝海机会。"
+        })
+    
+    if top_plat_name and idx + len(fallback_pool) < 4:
+        fallback_pool.append({
+            "title": "平台引流集中化",
+            "emoji": "📱", "color": "#1abc9c",
+            "desc": f"{top_plat_name}是主要引流平台（占比{top_plat_pct}），内容创意应重点适配该平台流量特点。"
+        })
+    
+    if idx + len(fallback_pool) < 4:
+        fallback_pool.append({
+            "title": "数据规模可观",
+            "emoji": "📈", "color": "#3498db",
+            "desc": f"共{total_products}款爆品入选，覆盖多个细分类目，行业选品空间广阔，值得持续深耕。"
+        })
+    
+    for fb in fallback_pool:
+        if idx >= 4:
+            break
+        insights.append({
+            "id": idx + 1,
+            "title": fb["title"],
+            "emoji": fb["emoji"],
+            "color": fb["color"],
+            "desc": fb["desc"],
+        })
+        idx += 1
     
     return insights
 
@@ -299,7 +438,7 @@ def build_multi_html(industries_data):
         else:
             tab_cls = ''
         
-        industry_tabs.append(f'''    <div id="industry-tab-{idx}" onclick="switchIndustry({idx})" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 {tab_cls}">
+        industry_tabs.append(f'''    <div id="industry-tab-{idx}" onclick="switchIndustry({idx})" style="--tab-color: {INDUSTRY_CONFIG[ind["name"]]["color_text"]}; --tab-color-deep: {INDUSTRY_CONFIG[ind["name"]]["color_deep"]};" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 {tab_cls}">
       <span>{ind["emoji"]}</span> {ind["name"]}
     </div>''')
         
@@ -402,10 +541,10 @@ def build_multi_html(industries_data):
     }}
 
     .active-industry-tab {{
-      background: #1e293b !important;
+      background: var(--tab-color) !important;
       color: #ffffff !important;
-      border-color: #1e293b !important;
-      box-shadow: 0 -6px 16px rgba(30,41,59,0.12);
+      border-color: var(--tab-color) !important;
+      box-shadow: none;
       z-index: 10;
       font-size: 16px;
     }}
@@ -701,13 +840,13 @@ def build_product_card(item, cat_emoji, colors):
             f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
             f'onclick="showImageModal(this.src, event)" '
             f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
-            f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, #f0eee3 0%, #dfdcce 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: #7a766c;">'
+            f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
             f'<span style="font-size: 32px;">{cat_emoji}</span>'
-            f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; color: #9a968c;">NO IMAGE</span>'
+            f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span>'
             f'</div>'
         )
     else:
-        image_html = f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, #f0eee3 0%, #dfdcce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7a766c;"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; color: #9a968c;">NO IMAGE</span></div>'
+        image_html = f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span></div>'
     
     tags_html_parts = []
     for tag in tags:
@@ -1037,10 +1176,10 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
     }}
 
     .active-industry-tab {{
-      background: #1e293b !important;
+      background: var(--tab-color) !important;
       color: #ffffff !important;
-      border-color: #1e293b !important;
-      box-shadow: 0 -6px 16px rgba(30,41,59,0.12);
+      border-color: var(--tab-color) !important;
+      box-shadow: none;
       z-index: 10;
       font-size: 16px;
     }}
@@ -1129,11 +1268,11 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       flex-shrink: 0;
     }}
 
-    /* 黄金分隔线微动效 */
+    /* 米色系分隔线微动效 */
     .gold-line {{
       width: 60px;
       height: 3px;
-      background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+      background: linear-gradient(90deg, #c9b88f, #d4c39d, #c9b88f);
       background-size: 200% 100%;
       border-radius: 2px;
       margin: 18px auto 12px auto;
@@ -1257,23 +1396,23 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
 
   <!-- 顶部总览海报（含版本筛选器） -->
   <div style="max-width: 1200px; margin: 0 auto 20px auto; padding: 0 10px;">
-    <div class="top-poster-mobile" style="background: linear-gradient(135deg, #dee2e6 0%, #ced4da 50%, #adb5bd 100%); color: #212529; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 6px 20px rgba(73,80,87,0.12); position: relative; overflow: hidden;">
+    <div class="top-poster-mobile" style="background: #e8e2d0; color: #5a5347; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 6px 20px rgba(120,110,80,0.10); position: relative; overflow: hidden;">
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
       <!-- 版本筛选器（右上角） -->
       <div style="position: absolute; top: 16px; right: 20px; z-index: 1;">
-        <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1px solid #adb5bd; border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; font-weight: 600; color: #495057; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23495057' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 10px center; outline: none; min-width: 140px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1px solid #c9b88f; border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 10px center; outline: none; min-width: 140px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
 {version_select_html}
         </select>
       </div>
 
-      <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #212529;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527;">
         商消pdd爆品榜单
       </h1>
       <div class="gold-line"></div>
-      <p style="margin: 0; font-size: 13px; color: #495057;">
-        覆盖 {len([i for i in industries_data if i["total"] > 0])} 个行业 · 总计 <strong style="color: #212529; font-size: 16px;">{sum(i["total"] for i in industries_data)}</strong> 款爆品
+      <p style="margin: 0; font-size: 13px; color: #6b6147;">
+        覆盖 {len([i for i in industries_data if i["total"] > 0])} 个行业 · 总计 <strong style="color: #3d3527; font-size: 16px;">{sum(i["total"] for i in industries_data)}</strong> 款爆品
       </p>
     </div>
   </div>
@@ -1401,7 +1540,7 @@ def main():
     print("📊 读取Excel数据...")
     
     industries_data = []
-    for sheet_name in ["食品饮料", "消电日百", "服饰", "美护"]:
+    for sheet_name in ["食品饮料", "美护", "消电日百", "服饰"]:
         print(f"  处理: {sheet_name}")
         if sheet_name == "食品饮料":
             df = pd.read_excel(FOOD_EXCEL_PATH)
