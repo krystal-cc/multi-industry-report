@@ -304,10 +304,26 @@ def build_multi_html(industries_data):
     </div>''')
         
         if is_empty:
-            # 美护行业空状态
+            # 空状态
             content = build_empty_industry_content(ind, idx, is_first)
         else:
             content = build_industry_content(ind, idx, is_first)
+        
+        # 为每个行业注入CSS变量，使按钮颜色跟随行业主题
+        c = INDUSTRY_CONFIG[ind["name"]]
+        hex_color = c["color_text"].lstrip("#")
+        r, g, b = int(hex_color[:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        css_vars = (
+            f'--ind-color: {c["color_text"]}; '
+            f'--ind-light: {c["color_light"]}; '
+            f'--ind-border: {c["color_border"]}; '
+            f'--ind-shadow: {c["shadow_color"]}; '
+            f'--ind-shadow-hover: rgba({r},{g},{b},0.25); '
+            f'--ind-link-bg: {c["color_bg"]}; '
+            f'--ind-link-text: {c["color_dark"]}; '
+            f'--ind-link-border: {c["color_border"]};'
+        )
+        content = f'<div class="industry-wrapper" style="{css_vars}">\n{content}\n</div>'
         industry_contents.append(content)
     
     all_tabs = "\n".join(industry_tabs)
@@ -1126,53 +1142,51 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       50% {{ background-position: 100% 50%; }}
     }}
 
-    /* 按钮基础样式 - 浅色系 */
+    /* 按钮基础样式 - 浅色系，颜色跟随行业CSS变量 */
     .btn-visit {{
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 5px 12px;
+      padding: 6px 12px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       text-decoration: none;
       flex: 1;
       text-align: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }}
-    /* 播放视频按钮 - 浅橙主题 */
+    /* 播放视频按钮 - 跟随行业浅色 */
     .btn-video {{
-      background-color: #fff4e6;
-      color: #ea580c;
-      border: 1px solid #fed7aa;
-      box-shadow: 0 1px 2px rgba(234,88,12,0.06);
+      background-color: var(--ind-light);
+      color: var(--ind-color);
+      border: 1px solid var(--ind-border);
+      box-shadow: 0 1px 2px var(--ind-shadow);
     }}
     .btn-video:hover {{
-      background-color: #ea580c;
+      background-color: var(--ind-color);
       color: #ffffff;
-      border-color: #ea580c;
+      border-color: var(--ind-color);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(234,88,12,0.25);
+      box-shadow: 0 4px 14px var(--ind-shadow-hover);
     }}
     .btn-video:hover .btn-emoji {{ filter: brightness(0) invert(1); }}
     .btn-emoji {{ transition: filter 0.2s ease; }}
-    /* 直达链路按钮 - 浅绿主题 */
+    /* 直达链路按钮 - 行业为主题，稍重一点 */
     .btn-link {{
-      background-color: #ecfdf5;
-      color: #047857;
-      border: 1px solid #a7f3d0;
-      box-shadow: 0 1px 2px rgba(4,120,87,0.06);
+      background-color: var(--ind-link-bg);
+      color: var(--ind-link-text);
+      border: 1px solid var(--ind-link-border);
+      box-shadow: 0 1px 2px var(--ind-shadow);
     }}
     .btn-link:hover {{
-      background-color: #047857;
+      background-color: var(--ind-link-text);
       color: #ffffff;
-      border-color: #047857;
+      border-color: var(--ind-link-text);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(4,120,87,0.25);
+      box-shadow: 0 4px 14px var(--ind-shadow-hover);
     }}
     .btn-link:hover .btn-emoji {{ filter: brightness(0) invert(1); }}
 

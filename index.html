@@ -207,53 +207,51 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* 按钮基础样式 - 浅色系 */
+    /* 按钮基础样式 - 浅色系，颜色跟随行业CSS变量 */
     .btn-visit {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 5px 12px;
+      padding: 6px 12px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       text-decoration: none;
       flex: 1;
       text-align: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
-    /* 播放视频按钮 - 浅橙主题 */
+    /* 播放视频按钮 - 跟随行业浅色 */
     .btn-video {
-      background-color: #fff4e6;
-      color: #ea580c;
-      border: 1px solid #fed7aa;
-      box-shadow: 0 1px 2px rgba(234,88,12,0.06);
+      background-color: var(--ind-light);
+      color: var(--ind-color);
+      border: 1px solid var(--ind-border);
+      box-shadow: 0 1px 2px var(--ind-shadow);
     }
     .btn-video:hover {
-      background-color: #ea580c;
+      background-color: var(--ind-color);
       color: #ffffff;
-      border-color: #ea580c;
+      border-color: var(--ind-color);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(234,88,12,0.25);
+      box-shadow: 0 4px 14px var(--ind-shadow-hover);
     }
     .btn-video:hover .btn-emoji { filter: brightness(0) invert(1); }
     .btn-emoji { transition: filter 0.2s ease; }
-    /* 直达链路按钮 - 浅绿主题 */
+    /* 直达链路按钮 - 行业为主题，稍重一点 */
     .btn-link {
-      background-color: #ecfdf5;
-      color: #047857;
-      border: 1px solid #a7f3d0;
-      box-shadow: 0 1px 2px rgba(4,120,87,0.06);
+      background-color: var(--ind-link-bg);
+      color: var(--ind-link-text);
+      border: 1px solid var(--ind-link-border);
+      box-shadow: 0 1px 2px var(--ind-shadow);
     }
     .btn-link:hover {
-      background-color: #047857;
+      background-color: var(--ind-link-text);
       color: #ffffff;
-      border-color: #047857;
+      border-color: var(--ind-link-text);
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(4,120,87,0.25);
+      box-shadow: 0 4px 14px var(--ind-shadow-hover);
     }
     .btn-link:hover .btn-emoji { filter: brightness(0) invert(1); }
 
@@ -370,6 +368,7 @@
 
   <!-- 行业内容区域 -->
   <div style="max-width: 1200px; margin: 0 auto;">
+<div class="industry-wrapper" style="--ind-color: #426b50; --ind-light: #eaf2eb; --ind-border: #dbe6e0; --ind-shadow: rgba(39,174,96,0.15); --ind-shadow-hover: rgba(66,107,80,0.25); --ind-link-bg: #f2f7f3; --ind-link-text: #1e8449; --ind-link-border: #dbe6e0;">
   <div id="industry-content-0" class="industry-content active industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
@@ -5162,7 +5161,9 @@
     </div>
 
   </div>
+</div>
 
+<div class="industry-wrapper" style="--ind-color: #2980b9; --ind-light: #ebf5fb; --ind-border: #d4e6f9; --ind-shadow: rgba(52,152,219,0.15); --ind-shadow-hover: rgba(41,128,185,0.25); --ind-link-bg: #f4f9fd; --ind-link-text: #2980b9; --ind-link-border: #d4e6f9;">
   <div id="industry-content-1" class="industry-content  industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
@@ -13935,7 +13936,9 @@
     </div>
 
   </div>
+</div>
 
+<div class="industry-wrapper" style="--ind-color: #c0392b; --ind-light: #fdf0f0; --ind-border: #f5d6d6; --ind-shadow: rgba(231,76,60,0.15); --ind-shadow-hover: rgba(192,57,43,0.25); --ind-link-bg: #fef9f9; --ind-link-text: #c0392b; --ind-link-border: #f5d6d6;">
   <div id="industry-content-2" class="industry-content  industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
@@ -18356,7 +18359,9 @@
     </div>
 
   </div>
+</div>
 
+<div class="industry-wrapper" style="--ind-color: #c2185b; --ind-light: #fce4ec; --ind-border: #f8bbd0; --ind-shadow: rgba(233,30,99,0.15); --ind-shadow-hover: rgba(194,24,91,0.25); --ind-link-bg: #fef5f7; --ind-link-text: #c2185b; --ind-link-border: #f8bbd0;">
   <div id="industry-content-3" class="industry-content  industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
@@ -22758,6 +22763,7 @@
     </div>
 
   </div>
+</div>
   </div>
 
   <!-- 图片放大查看模态层 -->
