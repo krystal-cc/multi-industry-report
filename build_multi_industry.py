@@ -799,11 +799,6 @@ def build_industry_content(ind, ind_idx, is_first):
 {contents_html}
       </div>
 
-      <!-- 页脚 -->
-      <div style="text-align: center; border-top: 1px dashed #eae7e0; margin-top: 40px; padding-top: 15px; font-size: 11px; color: #9c9995;">
-        <div>💡 长图使用提示：支持在任何兼容 HTML 渲染的阅读器中直接预览。</div>
-        <div style="margin-top: 4px;">由 CID 专项爆款分析助手精心制作 | {ind["name"]}行业 · 数据日期 2026-08</div>
-      </div>
     </div>
 
     <!-- 爆品创意黄金法则与高频词 -->
