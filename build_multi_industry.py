@@ -14,7 +14,7 @@ from collections import Counter
 
 EXCEL_PATH = "/Users/krystalcao/Desktop/爆品数据-最新.xlsx"
 FOOD_EXCEL_PATH = "/Users/krystalcao/Desktop/食品饮料.xlsx"
-BEAUTY_EXCEL_PATH = "/Users/krystalcao/Desktop/美护.xlsx"
+BEAUTY_EXCEL_PATH = "/Users/krystalcao/Desktop/美护2.xlsx"
 
 # 二级行业归类映射（合并过小的类目）
 INDUSTRY_MERGE = {
@@ -45,6 +45,11 @@ INDUSTRY_MERGE = {
         "肉禽蛋品": "其他",
         "宠物生活": "宠物相关",
         "喂养用品": "宠物相关",
+    },
+    "美护": {
+        "美甲工具": "其他",
+        "眼部彩妆": "其他",
+        "美妆工具": "其他",
     },
 }
 
@@ -192,6 +197,10 @@ CAT_EMOJI_MAP = {
     "膳食营养品": "💪", "休闲食品": "🍪", "传统滋补": "🍯",
     "茶叶": "🍵", "水饮冲调": "🥤",
     "水果蔬菜": "🍓", "酒类": "🍶",
+    # 美护
+    "面部洗护": "🧴", "美妆特殊化妆品": "✨", "眼部护理": "👁️",
+    "面部彩妆": "💄", "香水/香膏": "🌸", "唇部彩妆": "💋",
+    "其他": "📦",
 }
 
 def get_cat_emoji(industry, cat_name):
@@ -248,6 +257,17 @@ def get_insights(sheet_name, df):
              "desc": "\"除菌\"\"净化\"\"无油烹饪\"\"健康材质\"等卖点突出，后疫情时代消费者对居家环境健康关注度持续走高。"},
             {"id": 4, "title": "居家场景全覆盖", "emoji": "🏡", "color": "#8e44ad",
              "desc": "从厨具到收纳、从电器到家装，覆盖居家生活全场景，\"一物多用\"\"多功能\"是提升客单价的关键策略。"},
+        ]
+    elif sheet_name == "美护":
+        insights = [
+            {"id": 1, "title": "美白祛斑是绝对刚需", "emoji": "✨", "color": "#e91e63",
+             "desc": "特殊化妆品类目占比突出，\"淡斑\"\"美白\"\"377\"\"烟酰胺\"是高频词，功效型护肤需求持续爆发。"},
+            {"id": 2, "title": "面部洗护基本盘稳固", "emoji": "🧴", "color": "#9c27b0",
+             "desc": "面部洗护类目数量领先，\"温和\"\"控油\"\"氨基酸\"等成分卖点是转化核心，基础护肤需求稳定。"},
+            {"id": 3, "title": "不满意包退降低决策门槛", "emoji": "🛡️", "color": "#ff5722",
+             "desc": "\"不好用给你退\"\"试用不满意包退\"等零风险承诺，打消消费者对护肤品效果的顾虑。"},
+            {"id": 4, "title": "彩妆香水赛道多元化", "emoji": "💄", "color": "#e040fb",
+             "desc": "面部彩妆、香水香膏、唇部彩妆等类目多点开花，\"持妆\"\"显色\"\"高级感\"是爆款标题标配。"},
         ]
     elif sheet_name == "食品饮料":
         insights = [
