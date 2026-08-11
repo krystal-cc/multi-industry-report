@@ -100,10 +100,10 @@
     }
 
     .active-industry-tab {
-      background: #adb5bd !important;
-      color: #212529 !important;
-      border-color: #adb5bd !important;
-      box-shadow: 0 -6px 16px rgba(73,80,87,0.18);
+      background: var(--tab-color) !important;
+      color: #ffffff !important;
+      border-color: var(--tab-color) !important;
+      box-shadow: 0 -6px 16px rgba(0,0,0,0.15);
       z-index: 10;
       font-size: 16px;
     }
@@ -351,16 +351,16 @@
   <!-- 行业级 Tab 切换 -->
   <div style="max-width: 1200px; margin: 0 auto; padding: 0 10px;" class="industry-content-wrapper">
     <div class="flex items-end overflow-x-auto no-scrollbar gap-2 pl-2 select-none" id="industry-tabs-container">
-    <div id="industry-tab-0" onclick="switchIndustry(0)" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 active-industry-tab">
+    <div id="industry-tab-0" onclick="switchIndustry(0)" style="--tab-color: #426b50; --tab-color-deep: #1b6e3a;" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 active-industry-tab">
       <span>🍜</span> 食品饮料
     </div>
-    <div id="industry-tab-1" onclick="switchIndustry(1)" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 ">
+    <div id="industry-tab-1" onclick="switchIndustry(1)" style="--tab-color: #2980b9; --tab-color-deep: #2471a3;" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 ">
       <span>🏠</span> 消电日百
     </div>
-    <div id="industry-tab-2" onclick="switchIndustry(2)" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 ">
+    <div id="industry-tab-2" onclick="switchIndustry(2)" style="--tab-color: #b45309; --tab-color-deep: #92400e;" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 ">
       <span>👗</span> 服饰
     </div>
-    <div id="industry-tab-3" onclick="switchIndustry(3)" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 ">
+    <div id="industry-tab-3" onclick="switchIndustry(3)" style="--tab-color: #c2185b; --tab-color-deep: #ad1457;" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 ">
       <span>💄</span> 美护
     </div>
     </div>
