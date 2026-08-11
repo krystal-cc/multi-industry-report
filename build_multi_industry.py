@@ -1257,7 +1257,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
 
   <!-- 顶部总览海报（含版本筛选器） -->
   <div style="max-width: 1200px; margin: 0 auto 20px auto; padding: 0 10px;">
-    <div class="top-poster-mobile" style="background: linear-gradient(135deg, #dee2e6 0%, #ced4da 50%, #adb5bd 100%); color: #212529; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 6px 20px rgba(73,80,87,0.12); position: relative; overflow: hidden; border: 1px solid #adb5bd;">
+    <div class="top-poster-mobile" style="background: linear-gradient(135deg, #dee2e6 0%, #ced4da 50%, #adb5bd 100%); color: #212529; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 6px 20px rgba(73,80,87,0.12); position: relative; overflow: hidden;">
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
