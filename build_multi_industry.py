@@ -537,7 +537,7 @@ def build_multi_html(industries_data):
       <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px;">
         商消pdd爆品榜单
       </h1>
-      <div style="width: 60px; height: 3px; background-color: #f59e0b; margin: 18px auto 12px auto; border-radius: 2px;"></div>
+      <div class="gold-line"></div>
       <p style="margin: 0; font-size: 13px; color: #94a3b8;">
         覆盖 {len([i for i in industries_data if i["total"] > 0])} 个行业 · 总计 <strong style="color: #fff; font-size: 15px;">{sum(i["total"] for i in industries_data)}</strong> 款爆品
       </p>
@@ -700,14 +700,14 @@ def build_product_card(item, cat_emoji, colors):
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     
     return f'''    <!-- 商品卡片 -->
-    <div class="product-card-mobile" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+    <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
       {image_html}
       <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; justify-content: space-between;">
         <div>
           <div style="display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 4px;">
             {tags_html}
           </div>
-          <div style="font-size: 13px; font-weight: 700; color: #2d2a26; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4;" title="{name_escaped}">
+          <div class="product-title" style="font-size: 13px; font-weight: 700; color: #2d2a26; height: 36px;" title="{name_escaped}">
             {name}
           </div>
         </div>
@@ -715,8 +715,8 @@ def build_product_card(item, cat_emoji, colors):
           "{copy_text}"
         </div>
         <div style="display: flex; gap: 6px;">
-          <a href="{video_link}" target="_blank" style="flex: 1; text-align: center; background-color: #ff8c00; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(255,140,0,0.1); border: 1px solid #ff8c00;">🎬 播放视频</a>
-          <a href="{link}" target="_blank" style="flex: 1; text-align: center; background-color: {c_text}; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px {colors['shadow_color']}; border: 1px solid {c_text};">🔗 直达链路</a>
+          <a href="{video_link}" target="_blank" class="btn-visit" style="flex: 1; text-align: center; background-color: #ff8c00; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; justify-content: center; box-shadow: 0 2px 4px rgba(255,140,0,0.1); border: 1px solid #ff8c00;">🎬 播放视频</a>
+          <a href="{link}" target="_blank" class="btn-visit" style="flex: 1; text-align: center; background-color: {c_text}; color: white; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; justify-content: center; box-shadow: 0 2px 4px {colors['shadow_color']}; border: 1px solid {c_text};">🔗 直达链路</a>
         </div>
       </div>
     </div>'''
@@ -783,15 +783,18 @@ def build_industry_content(ind, ind_idx, is_first):
     # 高频词
     kw_spans = []
     for kw in keywords:
-        kw_spans.append(f'<span style="background-color: {c["color_bg"]}; color: {c["color_text"]}; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 12px; border: 1px solid {c["color_border"]}; margin-bottom: 6px; white-space: nowrap;">{kw["word"]} ({kw["count"]}次)</span>')
+        kw_spans.append(f'<span class="keyword-tag" style="background-color: {c["color_bg"]}; color: {c["color_text"]}; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 12px; border: 1px solid {c["color_border"]}; margin-bottom: 6px; white-space: nowrap;">{kw["word"]} ({kw["count"]}次)</span>')
     kw_html = " ".join(kw_spans)
     
     # 洞察卡片
     insight_cards = []
     for ins in insights:
-        insight_cards.append(f'''        <div style="background-color: #fafbf9; border-left: 3px solid {ins["color"]}; padding: 10px 12px; border-radius: 0 6px 6px 0; font-size: 12px;">
-          <strong style="color: {ins["color"]}; font-size: 13px;">{ins["id"]}. {ins["title"]} {ins["emoji"]}</strong><br>
-          {ins["desc"]}
+        insight_cards.append(f'''        <div class="insight-card" style="display: flex; align-items: flex-start; gap: 12px;">
+          <span class="insight-icon" style="background-color: {ins["color"]}15; color: {ins["color"]};">{ins["emoji"]}</span>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 700; color: {ins["color"]}; font-size: 13px; margin-bottom: 4px;">{ins["title"]}</div>
+            <div style="font-size: 12px; color: #5c5a56; line-height: 1.6;">{ins["desc"]}</div>
+          </div>
         </div>''')
     insights_html = "\n".join(insight_cards)
     
@@ -1073,6 +1076,103 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
     .border-forest {{ border-color: #1b3d22; }}
     ::selection {{ background-color: #dbeafe; color: #1e3a5f; }}
 
+    /* 商品卡片悬浮效果 */
+    .product-card {{
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+      border: 1px solid transparent;
+    }}
+    .product-card:hover {{
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.06);
+      border-color: rgba(0,0,0,0.06);
+    }}
+
+    /* 洞察卡片样式 */
+    .insight-card {{
+      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      border: 1px solid #f0ebe0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }}
+    .insight-card:hover {{
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }}
+    .insight-icon {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }}
+
+    /* 黄金分隔线微动效 */
+    .gold-line {{
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+      background-size: 200% 100%;
+      border-radius: 2px;
+      margin: 18px auto 12px auto;
+      animation: goldShimmer 3s ease-in-out infinite;
+    }}
+    @keyframes goldShimmer {{
+      0%, 100% {{ background-position: 0% 50%; }}
+      50% {{ background-position: 100% 50%; }}
+    }}
+
+    /* 按钮悬浮效果 */
+    .btn-visit {{
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }}
+    .btn-visit:hover {{
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }}
+
+    /* 商品标题行高优化 */
+    .product-title {{
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }}
+
+    /* 品类分布卡片激活态增强 */
+    .dist-card {{
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }}
+    .dist-card:hover {{
+      transform: translateY(-3px);
+    }}
+    .dist-card.active-dist-card {{
+      transform: translateY(-3px);
+    }}
+
+    /* 关键字标签悬浮 */
+    .keyword-tag {{
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }}
+    .keyword-tag:hover {{
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }}
+
     @media (max-width: 768px) {{
       body {{
         padding: 8px 0;
@@ -1123,7 +1223,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px;">
         商消pdd爆品榜单
       </h1>
-      <div style="width: 60px; height: 3px; background-color: #f59e0b; margin: 18px auto 12px auto; border-radius: 2px;"></div>
+      <div class="gold-line"></div>
       <p style="margin: 0; font-size: 13px; color: #94a3b8;">
         覆盖 {len([i for i in industries_data if i["total"] > 0])} 个行业 · 总计 <strong style="color: #fff; font-size: 15px;">{sum(i["total"] for i in industries_data)}</strong> 款爆品
       </p>
