@@ -402,10 +402,10 @@ def build_multi_html(industries_data):
     }}
 
     .active-industry-tab {{
-      background: #495057 !important;
+      background: #1e293b !important;
       color: #ffffff !important;
-      border-color: #495057 !important;
-      box-shadow: 0 -6px 16px rgba(73,80,87,0.18);
+      border-color: #1e293b !important;
+      box-shadow: 0 -6px 16px rgba(30,41,59,0.12);
       z-index: 10;
       font-size: 16px;
     }}
@@ -1037,10 +1037,10 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
     }}
 
     .active-industry-tab {{
-      background: #495057 !important;
+      background: #1e293b !important;
       color: #ffffff !important;
-      border-color: #495057 !important;
-      box-shadow: 0 -6px 16px rgba(73,80,87,0.18);
+      border-color: #1e293b !important;
+      box-shadow: 0 -6px 16px rgba(30,41,59,0.12);
       z-index: 10;
       font-size: 16px;
     }}
