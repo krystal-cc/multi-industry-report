@@ -322,7 +322,8 @@ def build_multi_html(industries_data):
             f'--ind-link-bg: {c["color_bg"]}; '
             f'--ind-link-text: {c["color_dark"]}; '
             f'--ind-link-border: {c["color_border"]}; '
-            f'--ind-quote-bg: {c["color_light"]};'
+            f'--ind-quote-bg: rgba({r},{g},{b},0.06); '
+            f'--ind-color-soft: rgba({r},{g},{b},0.4);'
         )
         content = f'<div class="industry-wrapper" style="{css_vars}">\n{content}\n</div>'
         industry_contents.append(content)
@@ -728,7 +729,7 @@ def build_product_card(item, cat_emoji, colors):
             {name}
           </div>
         </div>
-        <div style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #5a5651; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
+        <div style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
           "{copy_text}"
         </div>
         <div style="display: flex; gap: 6px;">
