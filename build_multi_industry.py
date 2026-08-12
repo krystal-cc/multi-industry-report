@@ -1140,6 +1140,38 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       display: none;
     }}
 
+    /* 版本筛选器 */
+    .version-selector {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    .version-selector select {{
+      appearance: none;
+      -webkit-appearance: none;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 36px 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      min-width: 160px;
+    }}
+    .version-selector select:hover {{
+      border-color: #94a3b8;
+    }}
+    .version-selector select:focus {{
+      border-color: #1e293b;
+      box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
+    }}
+
     /* 行业级 Tab */
     .industry-tab {{
       position: relative;
@@ -1362,6 +1394,11 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       .active-industry-tab {{
         font-size: 11px !important;
       }}
+      .version-selector select {{
+        min-width: 130px;
+        font-size: 12px;
+        padding: 6px 30px 6px 10px;
+      }}
     }}
   </style>
 </head>
@@ -1372,6 +1409,13 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
     <div class="top-poster-mobile" style="background: #e8e2d0; color: #5a5347; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 6px 20px rgba(120,110,80,0.10); position: relative; overflow: hidden;">
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
+
+      <!-- 版本筛选器（右上角） -->
+      <div style="position: absolute; top: 16px; right: 20px; z-index: 1;">
+        <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1px solid #c9b88f; border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 10px center; outline: none; min-width: 140px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
+{version_select_html}
+        </select>
+      </div>
 
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527;">
         商消pdd爆品榜单
@@ -1393,6 +1437,16 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
   </div>
 
   <script>
+    // 版本切换
+    function switchVersion(label) {{
+      const blocks = document.querySelectorAll('.version-block');
+      blocks.forEach(b => b.style.display = 'none');
+      const target = document.getElementById('version-' + label.replace(/\\s/g, '-'));
+      if (target) {{
+        target.style.display = 'block';
+      }}
+    }}
+
     // 行业切换
     function switchIndustry(idx) {{
       const contents = document.querySelectorAll('.industry-content');
@@ -1553,7 +1607,11 @@ def main():
             if label == version_label:  # 避免重复
                 continue
             # 跳过空内容的历史版本（如数据缺失时生成的版本）
-            if "8月10日更新" in label:
+            # 检查内容是否包含实际产品数据
+            if "product-card" not in content or "industry-content-" not in content:
+                continue
+            # 跳过问题版本
+            if any(skip in label for skip in ["8月10日更新", "8月11日更新"]):
                 continue
             history_versions.append((label, content.strip()))
     
