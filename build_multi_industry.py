@@ -12,9 +12,8 @@ import re
 from datetime import datetime
 from collections import Counter
 
-EXCEL_PATH = "/Users/krystalcao/Desktop/爆品数据-最新.xlsx"
-FOOD_EXCEL_PATH = "/Users/krystalcao/Desktop/食品饮料.xlsx"
-BEAUTY_EXCEL_PATH = "/Users/krystalcao/Desktop/美护2.xlsx"
+EXCEL_PATH = "/Users/krystalcao/Desktop/爆品数据-0811.xlsx"
+FOOD_EXCEL_PATH = "/Users/krystalcao/Desktop/食品饮料-最新.xlsx"
 
 # 二级行业归类映射（合并过小的类目）
 INDUSTRY_MERGE = {
@@ -104,8 +103,19 @@ INDUSTRY_CONFIG = {
     },
 }
 
+def find_sheet_name(excel_path, target_name):
+    """在Excel中查找匹配的sheet名（支持带（数字）后缀的sheet名）"""
+    xl = pd.ExcelFile(excel_path)
+    for s in xl.sheet_names:
+        if s == target_name or s.startswith(target_name):
+            return s
+    return None
+
 def read_sheet(sheet_name):
-    df = pd.read_excel(EXCEL_PATH, sheet_name)
+    actual_name = find_sheet_name(EXCEL_PATH, sheet_name)
+    if actual_name is None:
+        return None
+    df = pd.read_excel(EXCEL_PATH, actual_name)
     if df.empty:
         return None
     # 合并过小的二级类目
@@ -1544,14 +1554,6 @@ def main():
         print(f"  处理: {sheet_name}")
         if sheet_name == "食品饮料":
             df = pd.read_excel(FOOD_EXCEL_PATH)
-            if df.empty:
-                df = None
-            else:
-                merge_map = INDUSTRY_MERGE.get(sheet_name, {})
-                if merge_map:
-                    df["投放二级行业"] = df["投放二级行业"].apply(lambda x: merge_map.get(x, x))
-        elif sheet_name == "美护":
-            df = pd.read_excel(BEAUTY_EXCEL_PATH)
             if df.empty:
                 df = None
             else:
