@@ -1,0 +1,56 @@
+{
+  "title": "食品饮料行业新链路爆品选品",
+  "badge": "CID选品 · 爆款视频链路监控",
+  "subtitle": "食品饮料行业 · 07.13 - 07.14 数据合并去重精选",
+  "description": "数据提取范围: 2026-07-13 与 2026-07-14 | 精确去重后唯一爆品总数: <strong style=\"color: #fff; font-size: 14px;\">112</strong> 款",
+  "dashboard_title": "爆品类目分布看板",
+  "footer": "由 CID 专项爆款分析助手精心制作 | 数据日期 2026-07-15",
+  "insights_title": "爆品创意黄金法则与高频词",
+  "keywords_title": "爆品标题与卖点高频核心词云",
+  "secrets_title": "爆款视频带货密码提炼",
+  "output_file": "report.html",
+  "output_dir": "",
+  
+  "categories": [
+    {
+      "name": "粮油干货",
+      "emoji": "🌾",
+      "count": 42,
+      "percentage": "37.5%",
+      "products": [
+        {
+          "name": "【秘制老卤】正宗五香猪尾巴新鲜开袋即食熟食即食猪尾巴零食-灿",
+          "image_url": "",
+          "tags": ["方便速食"],
+          "source": "07.13",
+          "copy": "香卤猪尾巴打开就闻到浓郁的卤香味，肉质鲜香软糯，卤煮得很入味，越吃越香，大人小孩都爱吃",
+          "video_link": "https://www.douyin.com/video/7661259964979219775",
+          "link": "https://cid-landpage.smallfighter.com/v2/page/7f7/7f731297f9ee962e58177d56e2a6a2d8/"
+        }
+      ]
+    }
+  ],
+  
+  "keywords": [
+    {"word": "到手", "count": 37},
+    {"word": "正宗铁棍", "count": 20},
+    {"word": "山药面非", "count": 20}
+  ],
+  
+  "insights": [
+    {
+      "id": 1,
+      "title": "极致价格锚点轰炸",
+      "emoji": "💣",
+      "color": "#ff8c00",
+      "desc": "文案多用"9.9到手40包"、"两位数买西洋参"、"拍1发8袋"，用低客单、多赠品制造强烈的"超值占便宜"心理，降低转化决策门槛。"
+    },
+    {
+      "id": 2,
+      "title": "懒人即食 & 早餐场景代入",
+      "emoji": "⏰",
+      "color": "#426b50",
+      "desc": "围绕"免煮冲泡"、"开盖即食"、"早上来一碗，精神一整天"切入。针对高压、快节奏生活提供简单、美味且省时的代餐解决方案。"
+    }
+  ]
+}

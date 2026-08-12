@@ -631,13 +631,34 @@ def build_multi_html(industries_data):
 
       /* 顶部总览海报缩小内边距和字号 */
       .top-poster-mobile {{
-        padding: 20px 15px !important;
+        padding: 16px 14px 16px 14px !important;
       }}
       .top-poster-mobile h1 {{
-        font-size: 16px !important;
+        font-size: 14px !important;
+        line-height: 1.25 !important;
+        padding-right: 90px !important;  /* 给右上角版本下拉框让出位置 */
+        text-align: center !important;
+      }}
+      .top-poster-mobile h1 .poster-title-main {{
+        font-size: 17px !important;
+      }}
+      .top-poster-mobile h1 .poster-title-sub {{
+        font-size: 12px !important;
       }}
       .top-poster-mobile p {{
         font-size: 11px !important;
+      }}
+
+      /* 版本下拉框：移动端缩小并避开标题 */
+      .version-selector {{
+        top: 8px !important;
+        right: 8px !important;
+      }}
+      .version-selector select {{
+        min-width: 100px !important;
+        font-size: 10px !important;
+        padding: 4px 22px 4px 8px !important;
+        border-radius: 6px !important;
       }}
 
       /* 分布看板：移动端缩小 */
@@ -662,12 +683,22 @@ def build_multi_html(industries_data):
 
       /* 卡片内部：图片和文字调整 */
       .product-card-mobile .card-image {{
-        width: 120px !important;
-        height: 120px !important;
+        width: 92px !important;
+        height: 92px !important;
       }}
       .product-card-mobile .card-noimage {{
-        width: 120px !important;
-        height: 120px !important;
+        width: 92px !important;
+        height: 92px !important;
+      }}
+      .product-card-mobile .product-title {{
+        font-size: 12px !important;
+        line-height: 1.35 !important;
+        max-height: 36px !important;
+        min-height: 36px !important;
+      }}
+      .product-card-mobile .badge {{
+        font-size: 9px !important;
+        padding: 2px 5px !important;
       }}
 
       /* 洞察卡片：单列 */
@@ -875,7 +906,7 @@ def build_product_card(item, cat_emoji, colors):
           <div style="display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 4px;">
             {tags_html}
           </div>
-          <div class="product-title" style="font-size: 13px; font-weight: 700; color: #2d2a26; height: 36px;" title="{name_escaped}">
+          <div class="product-title" style="font-size: 13px; line-height: 1.4; font-weight: 700; color: #2d2a26; max-height: 40px; min-height: 40px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{name_escaped}">
             {name}
           </div>
         </div>
@@ -1380,10 +1411,37 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
         min-width: 0 !important;
       }}
       .top-poster-mobile {{
-        padding: 20px 15px !important;
+        padding: 16px 14px !important;
       }}
       .top-poster-mobile h1 {{
-        font-size: 16px !important;
+        font-size: 14px !important;
+        line-height: 1.25 !important;
+        padding-right: 90px !important;
+        text-align: center !important;
+      }}
+      .top-poster-mobile h1 .poster-title-main {{
+        font-size: 17px !important;
+      }}
+      .top-poster-mobile h1 .poster-title-sub {{
+        font-size: 12px !important;
+      }}
+      .product-card-mobile .card-image {{
+        width: 92px !important;
+        height: 92px !important;
+      }}
+      .product-card-mobile .card-noimage {{
+        width: 92px !important;
+        height: 92px !important;
+      }}
+      .product-card-mobile .product-title {{
+        font-size: 12px !important;
+        line-height: 1.35 !important;
+        max-height: 36px !important;
+        min-height: 36px !important;
+      }}
+      .product-card-mobile .badge {{
+        font-size: 9px !important;
+        padding: 2px 5px !important;
       }}
       .dist-board-mobile {{
         gap: 6px !important;
@@ -1395,10 +1453,15 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       .active-industry-tab {{
         font-size: 11px !important;
       }}
+      .version-selector {{
+        top: 8px !important;
+        right: 8px !important;
+      }}
       .version-selector select {{
-        min-width: 130px;
-        font-size: 12px;
-        padding: 6px 30px 6px 10px;
+        min-width: 100px !important;
+        font-size: 10px !important;
+        padding: 4px 22px 4px 8px !important;
+        border-radius: 6px !important;
       }}
     }}
   </style>
@@ -1412,15 +1475,15 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
       <!-- 版本筛选器（右上角） -->
-      <div style="position: absolute; top: 16px; right: 20px; z-index: 1;">
+      <div class="version-selector" style="position: absolute; top: 16px; right: 20px; z-index: 1;">
         <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1px solid #c9b88f; border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 10px center; outline: none; min-width: 140px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
 {version_select_html}
         </select>
       </div>
 
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.4;">
-        <span style="font-size: 26px;">商品消费业务部</span><br>
-        <span style="font-size: 18px; font-weight: 500;">pdd爆品榜单</span>
+        <span class="poster-title-main" style="font-size: 26px;">商品消费业务部</span><br>
+        <span class="poster-title-sub" style="font-size: 18px; font-weight: 500;">pdd爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
       <p style="margin: 0; font-size: 13px; color: #6b6147;">
