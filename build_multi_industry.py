@@ -636,7 +636,6 @@ def build_multi_html(industries_data):
       .top-poster-mobile h1 {{
         font-size: 14px !important;
         line-height: 1.25 !important;
-        padding-right: 90px !important;  /* 给右上角版本下拉框让出位置 */
         text-align: center !important;
       }}
       .top-poster-mobile h1 .poster-title-main {{
@@ -649,15 +648,21 @@ def build_multi_html(industries_data):
         font-size: 11px !important;
       }}
 
-      /* 版本下拉框：移动端缩小并避开标题 */
-      .version-selector {{
-        top: 8px !important;
-        right: 8px !important;
+      /* 版本下拉框：移动端脱离 absolute 定位，移到标题上方居中显示 */
+      .top-poster-mobile .version-selector {{
+        position: static !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 0 auto 10px auto !important;
+        padding: 0 !important;
+        width: 100% !important;
       }}
-      .version-selector select {{
-        min-width: 100px !important;
-        font-size: 10px !important;
-        padding: 4px 22px 4px 8px !important;
+      .top-poster-mobile .version-selector select {{
+        min-width: 0 !important;
+        width: auto !important;
+        font-size: 11px !important;
+        padding: 4px 26px 4px 12px !important;
         border-radius: 6px !important;
       }}
 
@@ -1416,7 +1421,6 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       .top-poster-mobile h1 {{
         font-size: 14px !important;
         line-height: 1.25 !important;
-        padding-right: 90px !important;
         text-align: center !important;
       }}
       .top-poster-mobile h1 .poster-title-main {{
@@ -1453,14 +1457,21 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       .active-industry-tab {{
         font-size: 11px !important;
       }}
-      .version-selector {{
-        top: 8px !important;
-        right: 8px !important;
+      /* 版本下拉框：移动端脱离 absolute，移到标题上方居中显示 */
+      .top-poster-mobile .version-selector {{
+        position: static !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin: 0 auto 10px auto !important;
+        padding: 0 !important;
+        width: 100% !important;
       }}
-      .version-selector select {{
-        min-width: 100px !important;
-        font-size: 10px !important;
-        padding: 4px 22px 4px 8px !important;
+      .top-poster-mobile .version-selector select {{
+        min-width: 0 !important;
+        width: auto !important;
+        font-size: 11px !important;
+        padding: 4px 26px 4px 12px !important;
         border-radius: 6px !important;
       }}
     }}
