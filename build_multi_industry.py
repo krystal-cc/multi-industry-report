@@ -706,6 +706,16 @@ def build_multi_html(industries_data):
         padding: 2px 5px !important;
       }}
 
+      /* 商家话术：移动端解除两行截断，完整展示 */
+      .product-card-mobile .product-quote {{
+        font-size: 11px !important;
+        line-height: 1.5 !important;
+        -webkit-line-clamp: unset !important;
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }}
+
       /* 洞察卡片：单列 */
       .insights-grid {{
         grid-template-columns: 1fr !important;
@@ -915,7 +925,7 @@ def build_product_card(item, cat_emoji, colors):
             {name}
           </div>
         </div>
-        <div style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
+        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
           "{copy_text}"
         </div>
         <div style="display: flex; gap: 6px;">
@@ -1446,6 +1456,16 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       .product-card-mobile .badge {{
         font-size: 9px !important;
         padding: 2px 5px !important;
+      }}
+
+      /* 商家话术：移动端解除两行截断，完整展示 */
+      .product-card-mobile .product-quote {{
+        font-size: 11px !important;
+        line-height: 1.5 !important;
+        -webkit-line-clamp: unset !important;
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
       }}
       .dist-board-mobile {{
         gap: 6px !important;
