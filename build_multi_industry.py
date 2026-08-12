@@ -485,6 +485,9 @@ def build_multi_html(industries_data):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>多行业爆品选品报告</title>
   <style>
     /* 离线可用：无需外部字体和 Tailwind CDN */
@@ -708,12 +711,13 @@ def build_multi_html(industries_data):
 
       /* 商家话术：移动端解除两行截断，完整展示 */
       .product-card-mobile .product-quote {{
+        display: block !important;
+        -webkit-line-clamp: 10 !important;
+        -webkit-box-orient: unset !important;
+        overflow: visible !important;
+        max-height: none !important;
         font-size: 11px !important;
         line-height: 1.5 !important;
-        -webkit-line-clamp: unset !important;
-        display: block !important;
-        max-height: none !important;
-        overflow: visible !important;
       }}
 
       /* 洞察卡片：单列 */
@@ -1136,6 +1140,9 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>多行业爆品选品报告</title>
   <style>
     * {{ box-sizing: border-box; }}
@@ -1460,12 +1467,13 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
 
       /* 商家话术：移动端解除两行截断，完整展示 */
       .product-card-mobile .product-quote {{
+        display: block !important;
+        -webkit-line-clamp: 10 !important;
+        -webkit-box-orient: unset !important;
+        overflow: visible !important;
+        max-height: none !important;
         font-size: 11px !important;
         line-height: 1.5 !important;
-        -webkit-line-clamp: unset !important;
-        display: block !important;
-        max-height: none !important;
-        overflow: visible !important;
       }}
       .dist-board-mobile {{
         gap: 6px !important;
