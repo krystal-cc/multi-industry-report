@@ -702,8 +702,8 @@ def build_multi_html(industries_data):
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
       
       <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px; line-height: 1.4;">
-        商品消费业务部<br>
-        pdd爆品榜单
+        <span style="font-size: 22px;">商品消费业务部</span><br>
+        <span style="font-size: 16px; font-weight: 500;">pdd爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
       <p style="margin: 0; font-size: 13px; color: #94a3b8;">
@@ -1419,8 +1419,8 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       </div>
 
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.4;">
-        商品消费业务部<br>
-        pdd爆品榜单
+        <span style="font-size: 26px;">商品消费业务部</span><br>
+        <span style="font-size: 18px; font-weight: 500;">pdd爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
       <p style="margin: 0; font-size: 13px; color: #6b6147;">
