@@ -645,7 +645,7 @@ def build_multi_html(industries_data):
         font-size: 17px !important;
       }}
       .top-poster-mobile h1 .poster-title-sub {{
-        font-size: 12px !important;
+        font-size: 22px !important;
       }}
       .top-poster-mobile p {{
         font-size: 11px !important;
@@ -1444,7 +1444,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
         font-size: 17px !important;
       }}
       .top-poster-mobile h1 .poster-title-sub {{
-        font-size: 12px !important;
+        font-size: 22px !important;
       }}
       .product-card-mobile .card-image {{
         width: 92px !important;
@@ -1521,8 +1521,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       </div>
 
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.4;">
-        <span class="poster-title-main" style="font-size: 26px;">商品消费业务部</span><br>
-        <span class="poster-title-sub" style="font-size: 18px; font-weight: 500;">pdd爆品榜单</span>
+        <span class="poster-title-sub" style="font-size: 32px; font-weight: 700; letter-spacing: 2px;">pdd爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
       <p style="margin: 0; font-size: 13px; color: #6b6147;">
