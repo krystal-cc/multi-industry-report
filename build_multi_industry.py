@@ -1653,7 +1653,7 @@ def main():
     print("📊 读取Excel数据...")
     
     industries_data = []
-    for sheet_name in ["食品饮料", "美护", "消电日百", "服饰"]:
+    for sheet_name in ["消电日百", "食品饮料", "美护", "服饰"]:
         print(f"  处理: {sheet_name}")
         if sheet_name == "食品饮料":
             df = pd.read_excel(FOOD_EXCEL_PATH)
