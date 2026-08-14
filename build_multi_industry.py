@@ -1704,9 +1704,8 @@ def main():
         industries_data.append(ind_data)
         print(f"    {ind_data['total']}款, {len(ind_data['categories'])}个类目")
     
-    # 今天日期作为版本标签
-    today = datetime.now()
-    version_label = f"{today.month}月{today.day}日更新"
+    # 版本标签固定为"8月13日更新"（反映爆品数据更新时间，非代码更新）
+    version_label = "8月13日更新"
     
     # 读取已有HTML中的历史版本数据
     output_dir = "/Users/krystalcao/Desktop/已完成"
