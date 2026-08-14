@@ -1144,6 +1144,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>多行业爆品选品报告</title>
+  <script src="https://cdn.busuanzi.cc/busuanzi/3.6.9/busuanzi.min.js" defer></script>
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -1644,6 +1645,19 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       }}
     }});
   </script>
+  <!-- 访问量统计（不蒜子） -->
+  <footer style="text-align: center; padding: 20px 16px 32px; color: #a89a7c; font-size: 12px; letter-spacing: 0.5px; line-height: 1.8;">
+    <div style="display: inline-flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center; background: #faf8f2; border: 1px solid #eeebe3; border-radius: 12px; padding: 14px 26px; box-shadow: 0 2px 8px rgba(120,110,80,0.06);">
+      <span>今日访问 <b id="busuanzi_today_pv" style="color: #6b5f45; font-weight: 700;">—</b> 次</span>
+      <span style="color: #e0d4bc;">|</span>
+      <span>今日访客 <b id="busuanzi_today_uv" style="color: #6b5f45; font-weight: 700;">—</b> 人</span>
+      <span style="color: #e0d4bc;">|</span>
+      <span>累计访问 <b id="busuanzi_site_pv" style="color: #6b5f45; font-weight: 700;">—</b> 次</span>
+      <span style="color: #e0d4bc;">|</span>
+      <span>累计访客 <b id="busuanzi_site_uv" style="color: #6b5f45; font-weight: 700;">—</b> 人</span>
+    </div>
+    <div style="margin-top: 8px; font-size: 11px; color: #c4b89d;">访问数据由不蒜子统计提供</div>
+  </footer>
 </body>
 </html>'''
     return html
