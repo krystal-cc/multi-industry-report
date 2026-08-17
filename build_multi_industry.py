@@ -23,7 +23,6 @@ DATA_SOURCES = [
         "label": "8月17日更新",
         "path": "/Users/krystalcao/Desktop/爆品榜单/【0817】爆品榜单.xlsx",
         "sheets": {"消电日百": "消电日百", "食品饮料": "食品", "美护": "美妆个护", "服饰": "服饰"},
-        "top_materials_path": "/Users/krystalcao/Desktop/【0817】_最高消耗素材.xlsx",
     },
     {
         "key": "0813",
@@ -144,29 +143,8 @@ def read_sheet(excel_path, industry_name, sheet_prefix):
     return df
 
 
-def load_top_materials(path):
-    """读取「最高消耗素材」数据，返回 {行业名: [{name, url}, ...]}"""
-    top_map = {}
-    if not path or not os.path.exists(path):
-        return top_map
-    xl = pd.ExcelFile(path)
-    for sheet in xl.sheet_names:
-        df = pd.read_excel(path, sheet)
-        items = []
-        for _, row in df.iterrows():
-            name = str(row.get("商品名称")) if pd.notna(row.get("商品名称")) else ""
-            url = str(row.get("素材URL")) if pd.notna(row.get("素材URL")) else ""
-            if name or url:
-                items.append({"name": name, "url": url})
-        top_map[sheet] = items
-    return top_map
-
-
 def load_industries_data(source):
     """根据数据源配置读取四个行业的数据（按 INDUSTRY_ORDER 顺序）"""
-    # 读取最高消耗素材（若配置了路径），按行业名匹配 sheet
-    top_materials = load_top_materials(source.get("top_materials_path", ""))
-
     industries_data = []
     for industry_name in INDUSTRY_ORDER:
         sheet_prefix = source["sheets"].get(industry_name, industry_name)
@@ -192,11 +170,11 @@ def load_industries_data(source):
                 "platforms": {},
             }
         else:
-            ind_data = build_industry_data(industry_name, df, top_materials.get(industry_name, []))
+            ind_data = build_industry_data(industry_name, df)
         industries_data.append(ind_data)
     return industries_data
 
-def build_industry_data(sheet_name, df, top_materials=None):
+def build_industry_data(sheet_name, df):
     """将一个行业的DataFrame转为报告所需的data结构"""
     total = len(df)
     
@@ -234,28 +212,6 @@ def build_industry_data(sheet_name, df, top_materials=None):
             "count": count,
             "percentage": f"{count/total*100:.1f}%",
             "products": products,
-        })
-    
-    # 最高消耗素材：作为该行业的一个普通类目并入，与其他商品走同一套卡片渲染
-    if top_materials:
-        mat_products = []
-        for m in top_materials:
-            mat_products.append({
-                "name": m["name"],
-                "image_url": "",
-                "tags": [],
-                "source": "",
-                "copy": "",
-                "video_link": m["url"],
-                "link": "#",
-                "show_link": False,
-            })
-        categories.append({
-            "name": "最高消耗素材",
-            "emoji": "🎬",
-            "count": len(mat_products),
-            "percentage": "",
-            "products": mat_products,
         })
     
     # 高频词统计（从商品名称和创意标题中提取）
@@ -881,7 +837,6 @@ def build_product_card(item, cat_emoji, colors):
     image_url = item.get("image_url", "")
     tags = item.get("tags", [])
     source = item.get("source", "")
-    show_link = item.get("show_link", True)
     c_text = colors["color_text"]
     c_light = colors["color_light"]
     
@@ -908,16 +863,6 @@ def build_product_card(item, cat_emoji, colors):
     name_escaped = name.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     
-    quote_html = ""
-    if copy_text:
-        quote_html = f'''        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
-          "{copy_text}"
-        </div>'''
-
-    link_btn = ""
-    if show_link:
-        link_btn = f'<a href="{link}" target="_blank" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>'
-    
     return f'''    <!-- 商品卡片 -->
     <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
       {image_html}
@@ -930,10 +875,12 @@ def build_product_card(item, cat_emoji, colors):
             {name}
           </div>
         </div>
-        {quote_html}
+        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
+          "{copy_text}"
+        </div>
         <div style="display: flex; gap: 6px;">
           <a href="{video_link}" target="_blank" class="btn-visit btn-video"><span class="btn-emoji">🎬</span> 播放视频</a>
-          {link_btn}
+          <a href="{link}" target="_blank" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>
         </div>
       </div>
     </div>'''
