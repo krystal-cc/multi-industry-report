@@ -190,15 +190,13 @@ def load_industries_data(source):
                 "keywords": [],
                 "insights": [],
                 "platforms": {},
-                "top_materials": top_materials.get(industry_name, []),
             }
         else:
-            ind_data = build_industry_data(industry_name, df)
-            ind_data["top_materials"] = top_materials.get(industry_name, [])
+            ind_data = build_industry_data(industry_name, df, top_materials.get(industry_name, []))
         industries_data.append(ind_data)
     return industries_data
 
-def build_industry_data(sheet_name, df):
+def build_industry_data(sheet_name, df, top_materials=None):
     """将一个行业的DataFrame转为报告所需的data结构"""
     total = len(df)
     
@@ -236,6 +234,28 @@ def build_industry_data(sheet_name, df):
             "count": count,
             "percentage": f"{count/total*100:.1f}%",
             "products": products,
+        })
+    
+    # 最高消耗素材：作为该行业的一个普通类目并入，与其他商品走同一套卡片渲染
+    if top_materials:
+        mat_products = []
+        for m in top_materials:
+            mat_products.append({
+                "name": m["name"],
+                "image_url": "",
+                "tags": [],
+                "source": "",
+                "copy": "",
+                "video_link": m["url"],
+                "link": "#",
+                "show_link": False,
+            })
+        categories.append({
+            "name": "最高消耗素材",
+            "emoji": "🎬",
+            "count": len(mat_products),
+            "percentage": "",
+            "products": mat_products,
         })
     
     # 高频词统计（从商品名称和创意标题中提取）
@@ -861,6 +881,7 @@ def build_product_card(item, cat_emoji, colors):
     image_url = item.get("image_url", "")
     tags = item.get("tags", [])
     source = item.get("source", "")
+    show_link = item.get("show_link", True)
     c_text = colors["color_text"]
     c_light = colors["color_light"]
     
@@ -887,6 +908,16 @@ def build_product_card(item, cat_emoji, colors):
     name_escaped = name.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     
+    quote_html = ""
+    if copy_text:
+        quote_html = f'''        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
+          "{copy_text}"
+        </div>'''
+
+    link_btn = ""
+    if show_link:
+        link_btn = f'<a href="{link}" target="_blank" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>'
+    
     return f'''    <!-- 商品卡片 -->
     <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
       {image_html}
@@ -899,12 +930,10 @@ def build_product_card(item, cat_emoji, colors):
             {name}
           </div>
         </div>
-        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
-          "{copy_text}"
-        </div>
+        {quote_html}
         <div style="display: flex; gap: 6px;">
           <a href="{video_link}" target="_blank" class="btn-visit btn-video"><span class="btn-emoji">🎬</span> 播放视频</a>
-          <a href="{link}" target="_blank" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>
+          {link_btn}
         </div>
       </div>
     </div>'''
@@ -991,32 +1020,6 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     for plat, count in sorted(platforms.items(), key=lambda x: x[1], reverse=True):
         platform_parts.append(f'<span style="background-color: #eef2ff; color: #4f46e5; font-size: 11px; padding: 2px 8px; border-radius: 8px; font-weight: 500;">{plat}: {count}款</span>')
     platform_html = " ".join(platform_parts) if platform_parts else ""
-
-    # 最高消耗素材专区（仅 0817 版本有该数据时显示）
-    top_materials = ind.get("top_materials", [])
-    top_material_html = ""
-    if top_materials:
-        material_cards = []
-        for m in top_materials:
-            m_name = m["name"].replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
-            m_url = m["url"].replace('"', '&quot;')
-            material_cards.append(f'''          <div class="top-material-card" style="flex: 0 0 230px; background-color: #ffffff; border: 1px solid {c["color_border"]}; border-radius: 12px; padding: 10px; box-sizing: border-box;">
-            <video controls preload="none" src="{m_url}" style="width: 100%; aspect-ratio: 9 / 16; background-color: #000; border-radius: 8px; object-fit: contain;"></video>
-            <div style="font-size: 12px; font-weight: 700; color: #2d2a26; margin-top: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{m_name}">{m["name"]}</div>
-            <a href="{m_url}" target="_blank" style="display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 600; color: {c["color_text"]}; text-decoration: none;">打开素材 ↗</a>
-          </div>''')
-        material_cards_html = "\n".join(material_cards)
-        top_material_html = f'''    <!-- 最高消耗素材专区 -->
-    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid {c["color_border"]};">
-      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-        🏆 最高消耗素材 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（消耗 Top {len(top_materials)} · 点击播放）</span>
-      </h3>
-      <div class="top-material-scroll" style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch;">
-{material_cards_html}
-      </div>
-    </div>
-
-'''
     
     return f'''  <div id="industry-content-{version_key}-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
@@ -1030,7 +1033,6 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
       </div>
     </div>
 
-{top_material_html}
     <!-- 品类商品展示区 -->
     <div style="margin-top: 25px;">
       <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid {c["color_border"]};">
