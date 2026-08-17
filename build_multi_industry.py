@@ -21,13 +21,14 @@ DATA_SOURCES = [
     {
         "key": "0817",
         "label": "8月17日更新",
-        "path": "/Users/krystalcao/Desktop/【0817】爆品榜单.xlsx",
+        "path": "/Users/krystalcao/Desktop/爆品榜单/【0817】爆品榜单.xlsx",
         "sheets": {"消电日百": "消电日百", "食品饮料": "食品", "美护": "美妆个护", "服饰": "服饰"},
+        "top_materials_path": "/Users/krystalcao/Desktop/【0817】_最高消耗素材.xlsx",
     },
     {
         "key": "0813",
         "label": "8月13日更新",
-        "path": "/Users/krystalcao/Desktop/【0813】爆品数据.xlsx",
+        "path": "/Users/krystalcao/Desktop/爆品榜单/【0813】爆品数据.xlsx",
         "sheets": {"消电日百": "消电日百", "食品饮料": "食品饮料", "美护": "美护", "服饰": "服饰"},
     },
 ]
@@ -143,8 +144,29 @@ def read_sheet(excel_path, industry_name, sheet_prefix):
     return df
 
 
+def load_top_materials(path):
+    """读取「最高消耗素材」数据，返回 {行业名: [{name, url}, ...]}"""
+    top_map = {}
+    if not path or not os.path.exists(path):
+        return top_map
+    xl = pd.ExcelFile(path)
+    for sheet in xl.sheet_names:
+        df = pd.read_excel(path, sheet)
+        items = []
+        for _, row in df.iterrows():
+            name = str(row.get("商品名称")) if pd.notna(row.get("商品名称")) else ""
+            url = str(row.get("素材URL")) if pd.notna(row.get("素材URL")) else ""
+            if name or url:
+                items.append({"name": name, "url": url})
+        top_map[sheet] = items
+    return top_map
+
+
 def load_industries_data(source):
     """根据数据源配置读取四个行业的数据（按 INDUSTRY_ORDER 顺序）"""
+    # 读取最高消耗素材（若配置了路径），按行业名匹配 sheet
+    top_materials = load_top_materials(source.get("top_materials_path", ""))
+
     industries_data = []
     for industry_name in INDUSTRY_ORDER:
         sheet_prefix = source["sheets"].get(industry_name, industry_name)
@@ -168,9 +190,11 @@ def load_industries_data(source):
                 "keywords": [],
                 "insights": [],
                 "platforms": {},
+                "top_materials": top_materials.get(industry_name, []),
             }
         else:
             ind_data = build_industry_data(industry_name, df)
+            ind_data["top_materials"] = top_materials.get(industry_name, [])
         industries_data.append(ind_data)
     return industries_data
 
@@ -967,6 +991,32 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     for plat, count in sorted(platforms.items(), key=lambda x: x[1], reverse=True):
         platform_parts.append(f'<span style="background-color: #eef2ff; color: #4f46e5; font-size: 11px; padding: 2px 8px; border-radius: 8px; font-weight: 500;">{plat}: {count}款</span>')
     platform_html = " ".join(platform_parts) if platform_parts else ""
+
+    # 最高消耗素材专区（仅 0817 版本有该数据时显示）
+    top_materials = ind.get("top_materials", [])
+    top_material_html = ""
+    if top_materials:
+        material_cards = []
+        for m in top_materials:
+            m_name = m["name"].replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
+            m_url = m["url"].replace('"', '&quot;')
+            material_cards.append(f'''          <div class="top-material-card" style="flex: 0 0 230px; background-color: #ffffff; border: 1px solid {c["color_border"]}; border-radius: 12px; padding: 10px; box-sizing: border-box;">
+            <video controls preload="none" src="{m_url}" style="width: 100%; aspect-ratio: 9 / 16; background-color: #000; border-radius: 8px; object-fit: contain;"></video>
+            <div style="font-size: 12px; font-weight: 700; color: #2d2a26; margin-top: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{m_name}">{m["name"]}</div>
+            <a href="{m_url}" target="_blank" style="display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 600; color: {c["color_text"]}; text-decoration: none;">打开素材 ↗</a>
+          </div>''')
+        material_cards_html = "\n".join(material_cards)
+        top_material_html = f'''    <!-- 最高消耗素材专区 -->
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid {c["color_border"]};">
+      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        🏆 最高消耗素材 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（消耗 Top {len(top_materials)} · 点击播放）</span>
+      </h3>
+      <div class="top-material-scroll" style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch;">
+{material_cards_html}
+      </div>
+    </div>
+
+'''
     
     return f'''  <div id="industry-content-{version_key}-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
@@ -980,6 +1030,7 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
       </div>
     </div>
 
+{top_material_html}
     <!-- 品类商品展示区 -->
     <div style="margin-top: 25px;">
       <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid {c["color_border"]};">
