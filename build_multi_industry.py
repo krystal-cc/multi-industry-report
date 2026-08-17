@@ -12,8 +12,25 @@ import re
 from datetime import datetime
 from collections import Counter
 
-EXCEL_PATH = "/Users/krystalcao/Desktop/爆品数据-0811.xlsx"
-FOOD_EXCEL_PATH = "/Users/krystalcao/Desktop/食品饮料-最新.xlsx"
+# 行业展示顺序
+INDUSTRY_ORDER = ["消电日百", "食品饮料", "美护", "服饰"]
+
+# 数据源配置：每个数据源对应一个时间版本（列表顺序决定默认显示顺序，第一个为默认显示）
+# sheets 为「行业名 -> sheet名匹配前缀」映射（新老数据的 sheet 命名不同）
+DATA_SOURCES = [
+    {
+        "key": "0817",
+        "label": "8月17日更新",
+        "path": "/Users/krystalcao/Desktop/【0817】爆品榜单.xlsx",
+        "sheets": {"消电日百": "消电日百", "食品饮料": "食品", "美护": "美妆个护", "服饰": "服饰"},
+    },
+    {
+        "key": "0813",
+        "label": "8月13日更新",
+        "path": "/Users/krystalcao/Desktop/【0813】爆品数据.xlsx",
+        "sheets": {"消电日百": "消电日百", "食品饮料": "食品饮料", "美护": "美护", "服饰": "服饰"},
+    },
+]
 
 # 二级行业归类映射（合并过小的类目）
 INDUSTRY_MERGE = {
@@ -111,18 +128,51 @@ def find_sheet_name(excel_path, target_name):
             return s
     return None
 
-def read_sheet(sheet_name):
-    actual_name = find_sheet_name(EXCEL_PATH, sheet_name)
+def read_sheet(excel_path, industry_name, sheet_prefix):
+    """从指定 Excel 读取某行业 sheet（sheet_prefix 为 sheet 名匹配前缀）"""
+    actual_name = find_sheet_name(excel_path, sheet_prefix)
     if actual_name is None:
         return None
-    df = pd.read_excel(EXCEL_PATH, actual_name)
+    df = pd.read_excel(excel_path, actual_name)
     if df.empty:
         return None
     # 合并过小的二级类目
-    merge_map = INDUSTRY_MERGE.get(sheet_name, {})
+    merge_map = INDUSTRY_MERGE.get(industry_name, {})
     if merge_map:
         df["投放二级行业"] = df["投放二级行业"].apply(lambda x: merge_map.get(x, x))
     return df
+
+
+def load_industries_data(source):
+    """根据数据源配置读取四个行业的数据（按 INDUSTRY_ORDER 顺序）"""
+    industries_data = []
+    for industry_name in INDUSTRY_ORDER:
+        sheet_prefix = source["sheets"].get(industry_name, industry_name)
+        df = read_sheet(source["path"], industry_name, sheet_prefix)
+        if df is None:
+            cfg = INDUSTRY_CONFIG[industry_name]
+            ind_data = {
+                "name": industry_name,
+                "emoji": cfg["emoji"],
+                "color": cfg["color"],
+                "color_dark": cfg["color_dark"],
+                "color_deep": cfg["color_deep"],
+                "color_text": cfg["color_text"],
+                "color_light": cfg["color_light"],
+                "color_bg": cfg["color_bg"],
+                "color_border": cfg["color_border"],
+                "color_btn_hover": cfg["color_btn_hover"],
+                "shadow_color": cfg["shadow_color"],
+                "total": 0,
+                "categories": [],
+                "keywords": [],
+                "insights": [],
+                "platforms": {},
+            }
+        else:
+            ind_data = build_industry_data(industry_name, df)
+        industries_data.append(ind_data)
+    return industries_data
 
 def build_industry_data(sheet_name, df):
     """将一个行业的DataFrame转为报告所需的data结构"""
@@ -432,8 +482,8 @@ def get_insights(sheet_name, df):
     
     return insights
 
-def build_multi_html(industries_data):
-    """生成支持行业切换的完整HTML"""
+def build_multi_html(industries_data, version_key):
+    """生成支持行业切换的完整HTML（version_key 用于隔离不同版本的DOM id）"""
     
     # 行业Tab
     industry_tabs = []
@@ -448,15 +498,15 @@ def build_multi_html(industries_data):
         else:
             tab_cls = ''
         
-        industry_tabs.append(f'''    <div id="industry-tab-{idx}" onclick="switchIndustry({idx})" style="--tab-color: {INDUSTRY_CONFIG[ind["name"]]["color_text"]}; --tab-color-deep: {INDUSTRY_CONFIG[ind["name"]]["color_deep"]};" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 {tab_cls}">
+        industry_tabs.append(f'''    <div id="industry-tab-{version_key}-{idx}" onclick="switchIndustry('{version_key}', {idx})" style="--tab-color: {INDUSTRY_CONFIG[ind["name"]]["color_text"]}; --tab-color-deep: {INDUSTRY_CONFIG[ind["name"]]["color_deep"]};" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 {tab_cls}">
       <span>{ind["emoji"]}</span> {ind["name"]}
     </div>''')
         
         if is_empty:
             # 空状态
-            content = build_empty_industry_content(ind, idx, is_first)
+            content = build_empty_industry_content(ind, idx, is_first, version_key)
         else:
-            content = build_industry_content(ind, idx, is_first)
+            content = build_industry_content(ind, idx, is_first, version_key)
         
         # 为每个行业注入CSS变量，使按钮颜色跟随行业主题
         c = INDUSTRY_CONFIG[ind["name"]]
@@ -773,110 +823,6 @@ def build_multi_html(industries_data):
   <div style="max-width: 1200px; margin: 0 auto;">
 {all_contents}
   </div>
-
-  <!-- 图片放大查看模态层 -->
-  <div id="image-modal" onclick="closeImageModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.85); z-index: 99999; cursor: zoom-out; align-items: center; justify-content: center; padding: 30px; box-sizing: border-box;">
-    <img id="image-modal-img" src="" alt="放大图" style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background-color: #fff;" />
-    <div style="position: absolute; top: 20px; right: 30px; color: #fff; font-size: 14px; background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 20px; pointer-events: none;">✕ 点击任意处关闭</div>
-  </div>
-
-  <script>
-    // 行业切换
-    function switchIndustry(idx) {{
-      const contents = document.querySelectorAll('.industry-content');
-      contents.forEach(c => {{
-        c.classList.remove('active');
-        c.style.display = 'none';
-      }});
-
-      const target = document.getElementById('industry-content-' + idx);
-      if (target) {{
-        target.classList.add('active');
-        target.style.display = 'block';
-      }}
-
-      const tabs = document.querySelectorAll('.industry-tab');
-      tabs.forEach(t => t.classList.remove('active-industry-tab'));
-
-      const activeTab = document.getElementById('industry-tab-' + idx);
-      if (activeTab) {{
-        activeTab.classList.add('active-industry-tab');
-        activeTab.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
-      }}
-    }}
-
-    // 品类切换（点击分布看板的卡片）
-    function switchCategory(indPrefix, idx) {{
-      const container = document.getElementById('industry-content-' + indPrefix);
-      if (!container) return;
-
-      // 1) 切换品类内容显示
-      const contents = container.querySelectorAll('.folder-content');
-      contents.forEach(c => {{
-        c.classList.remove('active', 'folder-show');
-        c.style.display = 'none';
-      }});
-
-      const target = document.getElementById('tab-content-' + indPrefix + '-' + idx);
-      if (target) {{
-        target.classList.add('folder-show');
-        target.style.display = 'block';
-      }}
-
-      // 2) 重置所有"分布卡片"为非激活态
-      const distCards = container.querySelectorAll('.dist-card');
-      distCards.forEach(card => {{
-        card.classList.remove('active-dist-card');
-        card.style.backgroundColor = '#faf9f5';
-        card.style.borderColor = '#eeebe3';
-        card.style.boxShadow = 'none';
-        const numEl = card.querySelector('.dist-card-num');
-        if (numEl) {{
-          numEl.style.color = card.getAttribute('data-color-text') || '#1b3d22';
-        }}
-      }});
-
-      // 3) 激活当前点击的"分布卡片"
-      const activeCard = document.getElementById('tab-header-' + indPrefix + '-' + idx);
-      if (activeCard) {{
-        const colorDeep = activeCard.getAttribute('data-color-deep') || '#1b3d22';
-        const colorBg = activeCard.getAttribute('data-color-bg') || '#faf9f5';
-        const shadow = activeCard.getAttribute('data-shadow') || 'rgba(27,61,34,0.08)';
-        activeCard.classList.add('active-dist-card');
-        activeCard.style.backgroundColor = colorBg;
-        activeCard.style.borderColor = colorDeep;
-        activeCard.style.borderWidth = '1.5px';
-        activeCard.style.boxShadow = '0 2px 8px ' + shadow;
-        const numEl = activeCard.querySelector('.dist-card-num');
-        if (numEl) {{
-          numEl.style.color = colorDeep;
-        }}
-        activeCard.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
-      }}
-    }}
-
-    // 图片放大查看
-    function showImageModal(src, event) {{
-      event.stopPropagation();
-      const modal = document.getElementById('image-modal');
-      const img = document.getElementById('image-modal-img');
-      img.src = src;
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }}
-    function closeImageModal() {{
-      const modal = document.getElementById('image-modal');
-      if (modal.style.display !== 'none') {{
-        modal.style.display = 'none';
-        document.getElementById('image-modal-img').src = '';
-        document.body.style.overflow = '';
-      }}
-    }}
-    // ESC 关闭
-    document.addEventListener('keydown', function(e) {{
-      if (e.key === 'Escape' || e.keyCode === 27) closeImageModal();
-    }});
-  </script>
 </body>
 </html>'''
     return html
@@ -940,8 +886,8 @@ def build_product_card(item, cat_emoji, colors):
     </div>'''
 
 
-def build_industry_content(ind, ind_idx, is_first):
-    """构建一个完整行业的内容区域"""
+def build_industry_content(ind, ind_idx, is_first, version_key):
+    """构建一个完整行业的内容区域（version_key 用于隔离不同版本的DOM id）"""
     total = ind["total"]
     categories = ind["categories"]
     keywords = ind["keywords"]
@@ -962,7 +908,7 @@ def build_industry_content(ind, ind_idx, is_first):
         else:
             card_style = 'background-color: #faf9f5; border: 1px solid #eeebe3;'
             num_color = c["color_text"]
-        dist_cards.append(f'''      <div id="tab-header-{ind_idx}-{cat_i}" onclick="switchCategory({ind_idx},{cat_i})" data-color-deep="{c["color_deep"]}" data-color-text="{c["color_text"]}" data-color-bg="{c["color_bg"]}" data-shadow="{c["shadow_color"]}" class="dist-card" style="flex: 1; min-width: 100px; {card_style} border-radius: 8px; padding: 8px 10px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: {'0 2px 8px ' + c["shadow_color"] if is_first_cat else 'none'};" onmouseover="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#fff';this.style.borderColor='{c["color_text"]}';this.style.boxShadow='0 2px 8px {c["shadow_color"]}';}}" onmouseout="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}}">
+        dist_cards.append(f'''      <div id="tab-header-{version_key}-{ind_idx}-{cat_i}" onclick="switchCategory('{version_key}',{ind_idx},{cat_i})" data-color-deep="{c["color_deep"]}" data-color-text="{c["color_text"]}" data-color-bg="{c["color_bg"]}" data-shadow="{c["shadow_color"]}" class="dist-card" style="flex: 1; min-width: 100px; {card_style} border-radius: 8px; padding: 8px 10px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: {'0 2px 8px ' + c["shadow_color"] if is_first_cat else 'none'};" onmouseover="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#fff';this.style.borderColor='{c["color_text"]}';this.style.boxShadow='0 2px 8px {c["shadow_color"]}';}}" onmouseout="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}}">
         <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 3px; white-space: nowrap; overflow: hidden;">
           <span style="font-size: 14px;">{cat["emoji"]}</span>
           <span style="font-size: 11px; color: #5c5a56; font-weight: 500; overflow: hidden; text-overflow: ellipsis;">{cat["name"]}</span>
@@ -983,7 +929,7 @@ def build_industry_content(ind, ind_idx, is_first):
         # 品类之间的 margin-top 统一
         top_margin = '1px'
         show_cls = 'folder-show' if cat_i == 0 else ''
-        tab_contents.append(f'''    <div id="tab-content-{ind_idx}-{cat_i}" class="folder-content {show_cls}">
+        tab_contents.append(f'''    <div id="tab-content-{version_key}-{ind_idx}-{cat_i}" class="folder-content {show_cls}">
   <div style="margin-top: {top_margin}; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
     <div style="font-size: 18px; font-weight: bold; color: {c["color_dark"]}; display: flex; align-items: center; gap: 8px;">
       <span style="font-size: 22px;">{cat["emoji"]}</span> {cat["name"]}
@@ -1022,7 +968,7 @@ def build_industry_content(ind, ind_idx, is_first):
         platform_parts.append(f'<span style="background-color: #eef2ff; color: #4f46e5; font-size: 11px; padding: 2px 8px; border-radius: 8px; font-weight: 500;">{plat}: {count}款</span>')
     platform_html = " ".join(platform_parts) if platform_parts else ""
     
-    return f'''  <div id="industry-content-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
+    return f'''  <div id="industry-content-{version_key}-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
     <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
@@ -1068,11 +1014,11 @@ def build_industry_content(ind, ind_idx, is_first):
   </div>'''
 
 
-def build_empty_industry_content(ind, ind_idx, is_first):
+def build_empty_industry_content(ind, ind_idx, is_first, version_key):
     """构建空行业（美护）占位内容"""
     active_cls = 'active' if is_first else ''
     c = ind  # colors
-    return f'''  <div id="industry-content-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
+    return f'''  <div id="industry-content-{version_key}-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 空状态占位 -->
     <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
@@ -1089,51 +1035,40 @@ def build_empty_industry_content(ind, ind_idx, is_first):
   </div>'''
 
 
-def build_versioned_html(industries_data, version_label, new_version_html, history_versions):
-    """将所有版本（历史+当前）合并为带版本筛选器的最终HTML"""
+def build_versioned_html(versions):
+    """将所有数据源版本合并为带版本筛选器的最终HTML
+    versions: [{"key", "label", "industries_data", "html"}, ...]，第一个为默认显示"""
     
-    # 构建版本列表：当前版本排最前面
-    all_versions = [(version_label, new_version_html)] + history_versions
-    
-    # 当前HTML已经包含完整结构（head/body/script），需要提取body内的核心内容
-    # 从new_version_html中提取body内容（剔除已有的顶部海报框，避免和外层版本海报框重复）
-    body_match = re.search(r'<body[^>]*>(.*)</body>', new_version_html, re.DOTALL)
-    if body_match:
-        current_body = body_match.group(1)
-        # 剔除 build_multi_html 自带的顶部总览海报框（避免双框）
-        current_body = re.sub(r'<!-- 顶部总览海报 -->.*?</div>\s*</div>', '', current_body, count=1, flags=re.DOTALL)
-    else:
-        current_body = new_version_html
-    
-    # 从new_version_html中提取head/style/script
-    head_match = re.search(r'<head>(.*?)</head>', new_version_html, re.DOTALL)
-    head_content = head_match.group(1) if head_match else ""
-    
-    # 提取所有script
-    script_match = re.search(r'<script>(.*?)</script>', new_version_html, re.DOTALL)
-    scripts = script_match.group(1) if script_match else ""
-    
-    # 构建版本选择器HTML
+    # 构建版本选择器选项 + 各版本内容块（剔除各自顶部海报框）
     version_options = []
-    for label, _ in all_versions:
-        version_options.append(f'          <option value="{label}">{label}</option>')
-    version_select_html = '\n'.join(version_options)
-    
-    # 构建所有版本内容
     version_blocks = []
-    for label, html_content in all_versions:
-        if label == version_label:
-            body = current_body
+    for i, v in enumerate(versions):
+        key = v["key"]
+        label = v["label"]
+        html_content = v["html"]
+        
+        industries_data = v["industries_data"]
+        version_total = sum(ind["total"] for ind in industries_data)
+        version_industry_count = len([ind for ind in industries_data if ind["total"] > 0])
+        
+        version_options.append(f'          <option value="{key}">{label}</option>')
+        
+        body_match = re.search(r'<body[^>]*>(.*)</body>', html_content, re.DOTALL)
+        if body_match:
+            body = body_match.group(1)
+            # 剔除 build_multi_html 自带的顶部总览海报框（避免双框）
+            body = re.sub(r'<!-- 顶部总览海报 -->.*?</div>\s*</div>', '', body, count=1, flags=re.DOTALL)
         else:
-            # 历史版本：从完整HTML中提取body（同时剔除顶部海报框）
-            bm = re.search(r'<body[^>]*>(.*)</body>', html_content, re.DOTALL)
-            if bm:
-                body = bm.group(1)
-                body = re.sub(r'<!-- 顶部总览海报 -->.*?</div>\s*</div>', '', body, count=1, flags=re.DOTALL)
-            else:
-                body = html_content
-        version_blocks.append(f'    <!-- VERSION_START: {label} -->\n    <div id="version-{label.replace(" ", "-")}" class="version-block" style="display: {"block" if label == version_label else "none"}; width: 100%;">\n{body}\n    </div>\n    <!-- VERSION_END -->')
+            body = html_content
+        
+        display = 'block' if i == 0 else 'none'
+        version_blocks.append(f'    <!-- VERSION_START: {label} -->\n    <div id="version-{key}" data-label="{label}" data-total="{version_total}" data-industry-count="{version_industry_count}" class="version-block" style="display: {display}; width: 100%;">\n{body}\n    </div>\n    <!-- VERSION_END -->')
+    
+    version_select_html = '\n'.join(version_options)
     all_versions_html = '\n'.join(version_blocks)
+    
+    # 默认版本（第一个）的行业数据，用于顶部海报总计
+    default_industries = versions[0]["industries_data"]
     
     html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1525,8 +1460,8 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
         <span class="poster-title-sub" style="font-size: 34px; font-weight: 700; letter-spacing: 2px;">pdd爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
-      <p style="margin: 0; font-size: 13px; color: #6b6147;">
-        覆盖 {len([i for i in industries_data if i["total"] > 0])} 个行业 · 总计 <strong style="color: #3d3527; font-size: 16px;">{sum(i["total"] for i in industries_data)}</strong> 款爆品
+      <p id="poster-summary" style="margin: 0; font-size: 13px; color: #6b6147;">
+        覆盖 <span id="poster-industry-count">{len([i for i in default_industries if i["total"] > 0])}</span> 个行业 · 总计 <strong id="poster-total" style="color: #3d3527; font-size: 16px;">{sum(i["total"] for i in default_industries)}</strong> 款爆品
       </p>
     </div>
   </div>
@@ -1542,42 +1477,70 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
 
   <script>
     // 版本切换
-    function switchVersion(label) {{
+    function switchVersion(key) {{
       const blocks = document.querySelectorAll('.version-block');
       blocks.forEach(b => b.style.display = 'none');
-      const target = document.getElementById('version-' + label.replace(/\\s/g, '-'));
-      if (target) {{
-        target.style.display = 'block';
-      }}
-    }}
+      const target = document.getElementById('version-' + key);
+      if (!target) return;
+      target.style.display = 'block';
 
-    // 行业切换
-    function switchIndustry(idx) {{
-      const contents = document.querySelectorAll('.industry-content');
-      contents.forEach(c => {{
+      // 顶部更新总计数字（覆盖行业数 + 总计爆品数）
+      const totalEl = document.getElementById('poster-total');
+      const countEl = document.getElementById('poster-industry-count');
+      const totalVal = target.getAttribute('data-total');
+      const countVal = target.getAttribute('data-industry-count');
+      if (totalEl && totalVal) totalEl.textContent = totalVal;
+      if (countEl && countVal) countEl.textContent = countVal;
+
+      // 重置所有版本块内的 industry tab/content 激活态
+      document.querySelectorAll('.industry-content').forEach(c => {{
         c.classList.remove('active');
         c.style.display = 'none';
       }});
+      document.querySelectorAll('.industry-tab').forEach(t => t.classList.remove('active-industry-tab'));
 
-      const target = document.getElementById('industry-content-' + idx);
+      // 激活新版本第一个 industry tab + content
+      const firstTab = document.getElementById('industry-tab-' + key + '-0');
+      const firstContent = document.getElementById('industry-content-' + key + '-0');
+      if (firstTab) firstTab.classList.add('active-industry-tab');
+      if (firstContent) {{
+        firstContent.classList.add('active');
+        firstContent.style.display = 'block';
+        // 同步激活该行业内的第一个 dist-card 和 folder-content
+        switchCategory(key, 0, 0);
+      }}
+    }}
+
+    // 行业切换（vk 为版本 key，idx 为行业索引）
+    function switchIndustry(vk, idx) {{
+      // 只重置当前版本块内的 industry-content，避免影响其他版本
+      const versionBlock = document.getElementById('version-' + vk);
+      if (versionBlock) {{
+        versionBlock.querySelectorAll('.industry-content').forEach(c => {{
+          c.classList.remove('active');
+          c.style.display = 'none';
+        }});
+        versionBlock.querySelectorAll('.industry-tab').forEach(t => t.classList.remove('active-industry-tab'));
+      }}
+
+      const target = document.getElementById('industry-content-' + vk + '-' + idx);
       if (target) {{
         target.classList.add('active');
         target.style.display = 'block';
+        // 切换行业时重置该行业的 dist-card 选中态为第一个
+        switchCategory(vk, idx, 0);
       }}
 
-      const tabs = document.querySelectorAll('.industry-tab');
-      tabs.forEach(t => t.classList.remove('active-industry-tab'));
-
-      const activeTab = document.getElementById('industry-tab-' + idx);
+      const activeTab = document.getElementById('industry-tab-' + vk + '-' + idx);
       if (activeTab) {{
         activeTab.classList.add('active-industry-tab');
         activeTab.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
       }}
     }}
 
-    // 品类切换
-    function switchCategory(indPrefix, idx) {{
-      const container = document.getElementById('industry-content-' + indPrefix);
+    // 品类切换（vk 为版本 key，indPrefix 为行业索引，idx 为品类索引）
+    function switchCategory(vk, indPrefix, idx) {{
+      const container = document.getElementById('industry-content-' + vk + '-' + indPrefix);
       if (!container) return;
 
       const contents = container.querySelectorAll('.folder-content');
@@ -1586,7 +1549,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
         c.style.display = 'none';
       }});
 
-      const target = document.getElementById('tab-content-' + indPrefix + '-' + idx);
+      const target = document.getElementById('tab-content-' + vk + '-' + indPrefix + '-' + idx);
       if (target) {{
         target.classList.add('folder-show');
         target.style.display = 'block';
@@ -1605,7 +1568,7 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
       }});
 
       // 3) 激活当前点击的"分布卡片"
-      const activeCard = document.getElementById('tab-header-' + indPrefix + '-' + idx);
+      const activeCard = document.getElementById('tab-header-' + vk + '-' + indPrefix + '-' + idx);
       if (activeCard) {{
         const colorDeep = activeCard.getAttribute('data-color-deep') || '#1b3d22';
         const colorBg = activeCard.getAttribute('data-color-bg') || '#faf9f5';
@@ -1666,86 +1629,38 @@ def build_versioned_html(industries_data, version_label, new_version_html, histo
 def main():
     print("📊 读取Excel数据...")
     
-    industries_data = []
-    for sheet_name in ["消电日百", "食品饮料", "美护", "服饰"]:
-        print(f"  处理: {sheet_name}")
-        if sheet_name == "食品饮料":
-            df = pd.read_excel(FOOD_EXCEL_PATH)
-            if df.empty:
-                df = None
-            else:
-                merge_map = INDUSTRY_MERGE.get(sheet_name, {})
-                if merge_map:
-                    df["投放二级行业"] = df["投放二级行业"].apply(lambda x: merge_map.get(x, x))
-        else:
-            df = read_sheet(sheet_name)
-        if df is None:
-            cfg = INDUSTRY_CONFIG[sheet_name]
-            ind_data = {
-                "name": sheet_name,
-                "emoji": cfg["emoji"],
-                "color": cfg["color"],
-                "color_dark": cfg["color_dark"],
-                "color_deep": cfg["color_deep"],
-                "color_text": cfg["color_text"],
-                "color_light": cfg["color_light"],
-                "color_bg": cfg["color_bg"],
-                "color_border": cfg["color_border"],
-                "color_btn_hover": cfg["color_btn_hover"],
-                "shadow_color": cfg["shadow_color"],
-                "total": 0,
-                "categories": [],
-                "keywords": [],
-                "insights": [],
-                "platforms": {},
-            }
-        else:
-            ind_data = build_industry_data(sheet_name, df)
-        industries_data.append(ind_data)
-        print(f"    {ind_data['total']}款, {len(ind_data['categories'])}个类目")
+    # 遍历所有数据源，生成对应版本
+    versions = []
+    for source in DATA_SOURCES:
+        print(f"  处理版本: {source['label']} [{source['key']}]")
+        industries_data = load_industries_data(source)
+        for ind in industries_data:
+            print(f"    {ind['name']}: {ind['total']}款, {len(ind['categories'])}个类目")
+        html = build_multi_html(industries_data, source["key"])
+        versions.append({
+            "key": source["key"],
+            "label": source["label"],
+            "industries_data": industries_data,
+            "html": html,
+        })
     
-    # 版本标签固定为"8月13日更新"（反映爆品数据更新时间，非代码更新）
-    version_label = "8月13日更新"
-    
-    # 读取已有HTML中的历史版本数据
     output_dir = "/Users/krystalcao/Desktop/已完成"
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "多行业爆品选品报告.html")
     
-    history_versions = []  # [(label, html_content_section)]
-    if os.path.exists(output_path):
-        with open(output_path, "r", encoding="utf-8") as f:
-            old_html = f.read()
-        # 提取旧版本信息：<!-- VERSION_START: label --> 到 <!-- VERSION_END -->
-        pattern = r'<!-- VERSION_START: (.*?) -->(.*?)<!-- VERSION_END -->'
-        matches = re.findall(pattern, old_html, re.DOTALL)
-        for label, content in matches:
-            if label == version_label:  # 避免重复
-                continue
-            # 跳过空内容的历史版本（如数据缺失时生成的版本）
-            # 检查内容是否包含实际产品数据
-            if "product-card" not in content or "industry-content-" not in content:
-                continue
-            # 跳过问题版本
-            if any(skip in label for skip in ["8月10日更新", "8月11日更新"]):
-                continue
-            history_versions.append((label, content.strip()))
-    
     print("🔨 生成HTML...")
-    # 当前版本的内容
-    new_version_html = build_multi_html(industries_data)
-    
-    # 合并所有版本生成最终HTML
-    final_html = build_versioned_html(industries_data, version_label, new_version_html, history_versions)
+    final_html = build_versioned_html(versions)
     
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(final_html)
     
     file_size = os.path.getsize(output_path)
     print(f"✅ 报告已生成: {output_path}")
-    print(f"   版本: {version_label}")
     print(f"   文件大小: {file_size/1024:.1f} KB")
-    print(f"   总爆品数: {sum(i['total'] for i in industries_data)}")
+    print(f"   版本数: {len(versions)}")
+    for v in versions:
+        total = sum(i['total'] for i in v['industries_data'])
+        print(f"   - {v['label']}: 共{total}款爆品")
 
 
 if __name__ == "__main__":
