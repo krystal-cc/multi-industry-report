@@ -1239,7 +1239,7 @@ def inject_date_filter_into_industry_row(body, version_key, version_options):
     version_options: [('<option ...>', ...)]，用于生成 select 选项。"""
     select_options_html = '\n'.join(version_options)
     date_select_html = (
-        '<div class="version-selector" style="flex: 0 0 auto; margin-left: auto;">\n'
+        '<div class="version-selector" style="flex: 0 0 auto;">\n'
         f'        <select id="version-select-{version_key}" onchange="switchVersion(this.value)" '
         'style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1.5px solid #c9b88f; border-radius: 10px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 600; color: #5a5347; cursor: pointer; '
         "background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); "
@@ -1256,14 +1256,21 @@ def inject_date_filter_into_industry_row(body, version_key, version_options):
     )
     def _replace(m):
         inner = m.group(2)
-        new_head = (
+        # 新结构：外层 flex（justify-content: space-between）
+        #  ├─ 左侧：原行业 Tab 容器
+        #  └─ 右侧：日期下拉（两端对齐，两者之间留空）
+        new_html = (
             '<div style="max-width: 1200px; margin: 0 auto; padding: 0 10px;" class="industry-content-wrapper">\n'
-            '    <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">\n'
+            '    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;">\n'
             '      <div class="flex items-end overflow-x-auto no-scrollbar gap-2 pl-2 select-none" '
             f'id="industry-tabs-container-{version_key}" style="flex: 1 1 auto; min-width: 0;">'
+            + inner +
+            '\n      </div>\n'
+            '      ' + date_select_html + '\n'
+            '    </div>\n'
+            '  </div>'
         )
-        new_tail = '\n      ' + date_select_html + '\n    </div>\n  </div>'
-        return new_head + inner + new_tail
+        return new_html
     new_body, n = pattern.subn(_replace, body, count=1)
     if n == 0:
         return body
