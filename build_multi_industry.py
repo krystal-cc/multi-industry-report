@@ -1855,7 +1855,6 @@ def build_versioned_html(versions, nodes):
       <div class="banner-inner" style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
         <!-- 左侧：标题区 -->
         <div style="text-align: left; flex: 1 1 auto; min-width: 240px;">
-          <div style="font-size: 12px; font-weight: 600; letter-spacing: 3.5px; color: #8a6a2a; text-transform: uppercase; margin-bottom: 6px;">CID · TRENDING PICKS</div>
           <h1 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
             <span class="poster-title-sub" style="font-size: 34px; font-weight: 800; letter-spacing: 2.5px; background: linear-gradient(135deg, #3d3527 0%, #6b5a3e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CID爆品榜单</span>
           </h1>
