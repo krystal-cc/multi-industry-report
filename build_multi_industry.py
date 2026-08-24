@@ -638,6 +638,9 @@ def build_multi_html(industries_data, version_key):
       background-image: 
         radial-gradient(at 0% 0%, hsla(210,30%,96%,1) 0px, transparent 50%),
         radial-gradient(at 100% 100%, hsla(210,20%,92%,1) 0px, transparent 50%);
+      /* 始终预留滚动条空间，避免切换板块时页面高度变化导致横向跳动 */
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
     }}
     .min-h-screen {{ min-height: 100vh; }}
     .text-slate-800 {{ color: #1e293b; }}
@@ -1289,6 +1292,9 @@ def build_versioned_html(versions, nodes):
       background-image: 
         radial-gradient(at 0% 0%, hsla(210,30%,96%,1) 0px, transparent 50%),
         radial-gradient(at 100% 100%, hsla(210,20%,92%,1) 0px, transparent 50%);
+      /* 始终预留滚动条空间，避免切换板块时页面高度变化导致横向跳动 */
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
     }}
     .min-h-screen {{ min-height: 100vh; }}
     .text-slate-800 {{ color: #1e293b; }}
