@@ -935,16 +935,16 @@ def build_product_card(item, cat_emoji, colors):
         # onerror 时把 img 隐藏，同时显示后面预置的 NO IMAGE 占位 div（高度自适应右侧总高度）
         # 图片支持点击放大：cursor: zoom-in + onclick 触发 showImageModal
         image_html = (
-            f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 100px; height: 100px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
+            f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
             f'onclick="showImageModal(this.src, event)" '
             f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
-            f'<div class="card-noimage" style="width: 100px; height: 100px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
+            f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
             f'<span style="font-size: 32px;">{cat_emoji}</span>'
             f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span>'
             f'</div>'
         )
     else:
-        image_html = f'<div class="card-noimage" style="width: 100px; height: 100px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span></div>'
+        image_html = f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span></div>'
     
     tags_html_parts = []
     for tag in tags:
@@ -955,9 +955,9 @@ def build_product_card(item, cat_emoji, colors):
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     
     return f'''    <!-- 商品卡片 -->
-    <div class="product-card-mobile product-card" style="width: calc(33.333% - 10px); min-width: 280px; background-color: #ffffff; border-radius: 12px; padding: 12px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 10px; align-items: stretch;">
+    <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
       {image_html}
-      <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; justify-content: space-between;">
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; justify-content: space-between;">
         <div>
           <div style="display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 4px;">
             {tags_html}
@@ -966,7 +966,7 @@ def build_product_card(item, cat_emoji, colors):
             {name}
           </div>
         </div>
-        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; min-height: 52px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
+        <div class="product-quote" style="background-color: var(--ind-quote-bg); border-left: 2px solid var(--ind-color-soft); padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #6b6b6b; font-style: italic; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{copy_escaped}">
           "{copy_text}"
         </div>
         <div style="display: flex; gap: 6px;">
@@ -1028,7 +1028,7 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     </div>
     <div style="font-size: 12px; color: #8c8985;">分行业精选</div>
   </div>
-  <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 15px;">
 {cards_html}
   </div>
 </div>''')
@@ -1189,7 +1189,7 @@ def build_node_content(node, node_idx, is_first):
     </div>
     <!-- 商品卡片网格 -->
     <div style="max-width: 1200px; margin: 18px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
-      <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 15px;">
 {cards_html}
       </div>
     </div>
