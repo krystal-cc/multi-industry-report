@@ -571,7 +571,7 @@
       </div>
       <div class="version-selector" style="flex: 0 0 auto;">
         <select id="version-select-0817" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1.5px solid #c9b88f; border-radius: 10px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 12px center; outline: none; min-width: 160px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
-          <option value="0817">8月17日更新</option>
+          <option selected value="0817">8月17日更新</option>
           <option value="0813">8月13日更新</option>
         </select>
       </div>
@@ -28046,7 +28046,7 @@
       <div class="version-selector" style="flex: 0 0 auto;">
         <select id="version-select-0813" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1.5px solid #c9b88f; border-radius: 10px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 12px center; outline: none; min-width: 160px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
           <option value="0817">8月17日更新</option>
-          <option value="0813">8月13日更新</option>
+          <option selected value="0813">8月13日更新</option>
         </select>
       </div>
     </div>
@@ -50375,6 +50375,9 @@
       const target = document.getElementById('version-' + key);
       if (!target) return;
       target.style.display = 'block';
+
+      // 同步所有版本块内的日期下拉框，让它们的显示文字跟随当前选中日期
+      document.querySelectorAll('select[id^="version-select-"]').forEach(s => { s.value = key; });
 
       // 顶部更新总计数字（覆盖行业数 + 总计爆品数）
       const totalEl = document.getElementById('poster-total');

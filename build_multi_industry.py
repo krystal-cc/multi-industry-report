@@ -1237,7 +1237,12 @@ def inject_date_filter_into_industry_row(body, version_key, version_options):
     """在每个版本 body 的"行业级 Tab 切换"div 同行右侧注入日期筛选下拉。
     保持原位置：左=行业 Tab，右=日期下拉（原本日期下拉就在右对齐）。
     version_options: [('<option ...>', ...)]，用于生成 select 选项。"""
-    select_options_html = '\n'.join(version_options)
+    # 给当前版本对应的 option 加 selected，确保每个版本块的下拉框默认显示自己的日期
+    def _mark_selected(opt):
+        if f'value="{version_key}"' in opt:
+            return opt.replace('<option ', '<option selected ', 1)
+        return opt
+    select_options_html = '\n'.join(_mark_selected(o) for o in version_options)
     date_select_html = (
         '<div class="version-selector" style="flex: 0 0 auto;">\n'
         f'        <select id="version-select-{version_key}" onchange="switchVersion(this.value)" '
@@ -1926,6 +1931,9 @@ def build_versioned_html(versions, nodes):
       const target = document.getElementById('version-' + key);
       if (!target) return;
       target.style.display = 'block';
+
+      // 同步所有版本块内的日期下拉框，让它们的显示文字跟随当前选中日期
+      document.querySelectorAll('select[id^="version-select-"]').forEach(s => {{ s.value = key; }});
 
       // 顶部更新总计数字（覆盖行业数 + 总计爆品数）
       const totalEl = document.getElementById('poster-total');
