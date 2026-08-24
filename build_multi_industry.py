@@ -1288,6 +1288,10 @@ def build_versioned_html(versions, nodes):
     # 构建版本选择器选项 + 各版本内容块（剔除各自顶部海报框）
     version_options = []
     version_blocks = []
+    # 先收集完整的版本选项（保证每个日期下拉都包含所有版本）
+    for v in versions:
+        version_options.append(f'          <option value="{v["key"]}">{v["label"]}</option>')
+    
     for i, v in enumerate(versions):
         key = v["key"]
         label = v["label"]
@@ -1296,8 +1300,6 @@ def build_versioned_html(versions, nodes):
         industries_data = v["industries_data"]
         version_total = sum(ind["total"] for ind in industries_data)
         version_industry_count = len([ind for ind in industries_data if ind["total"] > 0])
-        
-        version_options.append(f'          <option value="{key}">{label}</option>')
         
         body_match = re.search(r'<body[^>]*>(.*)</body>', html_content, re.DOTALL)
         if body_match:
