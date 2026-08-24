@@ -32,6 +32,43 @@ DATA_SOURCES = [
     },
 ]
 
+# ================= 节点爆品 =================
+# 节点爆品：针对营销节点（开学季、中秋节等）的独立商品集合，每个节点一期数据（不保留历史版本）
+# 与常规爆品不同：节点爆品不按 4 行业分 sheet，而是每个节点一个 Excel（或 sheet），里面是平铺的商品列表
+# 商品列字段（与常规爆品对齐）：商品名称、商品主图、创意标题、引流平台、落地页URL、抖音视频链接、（可选）分类/投放二级行业
+# 当 path 为空或文件不存在时，该节点显示「数据待填充」占位，等数据到位后填入 path 重新运行即可
+NODE_SOURCES = [
+    {
+        "key": "kaixue",          # 唯一标识（用于锚点/切换）
+        "label": "开学季",
+        "emoji": "🎒",
+        "color": "#e67e22",       # 节点主色（用于 Tab 高亮）
+        "path": "",               # 待填：节点爆品 Excel 路径
+        "sheet": None,            # 指定 sheet 名，None 表示读取第一个 sheet
+    },
+    {
+        "key": "zhongqiu",
+        "label": "中秋节",
+        "emoji": "🥮",
+        "color": "#d4a017",
+        "path": "",
+        "sheet": None,
+    },
+]
+
+# 节点爆品统一主题配色（节日暖色系，用于节点商品卡片）
+NODE_THEME = {
+    "color": "#c0392b",
+    "color_dark": "#a93226",
+    "color_deep": "#8b2118",
+    "color_text": "#c0392b",
+    "color_light": "#fdf2f2",
+    "color_bg": "#fefaf9",
+    "color_border": "#f0d6d3",
+    "color_btn_hover": "#7d1a12",
+    "shadow_color": "rgba(192,57,43,0.15)",
+}
+
 # 二级行业归类映射（合并过小的类目）
 INDUSTRY_MERGE = {
     "服饰": {
@@ -173,6 +210,57 @@ def load_industries_data(source):
             ind_data = build_industry_data(industry_name, df)
         industries_data.append(ind_data)
     return industries_data
+
+def load_node_products(node_source):
+    """读取单个节点爆品的数据，返回平铺的商品列表；无数据返回 None
+    
+    节点爆品与常规爆品不同：不按 4 行业分 sheet，而是单个 Excel（或 sheet）里的独立商品列表。
+    列字段尽量兼容：商品名称、商品主图、创意标题、引流平台、落地页URL、抖音视频链接，
+    分类标签可选（优先"分类"列，其次"投放二级行业"列）。
+    """
+    path = node_source.get("path", "")
+    if not path or not os.path.exists(path):
+        return None
+    
+    sheet = node_source.get("sheet")
+    try:
+        if sheet:
+            df = pd.read_excel(path, sheet)
+        else:
+            df = pd.read_excel(path)  # 默认读取第一个 sheet
+    except Exception:
+        return None
+    
+    if df.empty:
+        return None
+    
+    products = []
+    for _, row in df.iterrows():
+        # 处理商品主图（NaN或空字符串都视为无图）
+        img = row.get("商品主图")
+        img_url = str(img) if pd.notna(img) and str(img).strip() and str(img) != "nan" else ""
+        # 处理商品名称
+        name = row.get("商品名称")
+        name_str = str(name) if pd.notna(name) else ""
+        # 分类标签（可选）：优先"分类"列，其次"投放二级行业"列
+        tag_str = ""
+        for col in ("分类", "投放二级行业"):
+            if col in df.columns:
+                tv = row.get(col)
+                if tv is not None and pd.notna(tv) and str(tv).strip() and str(tv) != "nan":
+                    tag_str = str(tv).strip()
+                    break
+        
+        products.append({
+            "name": name_str,
+            "image_url": img_url,
+            "tags": [tag_str] if tag_str else [],
+            "source": str(row.get("引流平台", "")) if pd.notna(row.get("引流平台")) else "",
+            "copy": str(row.get("创意标题", "")) if pd.notna(row.get("创意标题")) else "",
+            "video_link": str(row.get("抖音视频链接", "")) if pd.notna(row.get("抖音视频链接")) else "#",
+            "link": str(row.get("落地页URL", "")) if pd.notna(row.get("落地页URL")) else "#",
+        })
+    return products
 
 def build_industry_data(sheet_name, df):
     """将一个行业的DataFrame转为报告所需的data结构"""
@@ -1035,9 +1123,120 @@ def build_empty_industry_content(ind, ind_idx, is_first, version_key):
   </div>'''
 
 
-def build_versioned_html(versions):
-    """将所有数据源版本合并为带版本筛选器的最终HTML
-    versions: [{"key", "label", "industries_data", "html"}, ...]，第一个为默认显示"""
+def build_css_vars(color_config):
+    """根据配色字典生成商品卡片所需的 CSS 变量字符串（用于让按钮/标签跟随主题色）"""
+    c = color_config
+    hex_color = c["color_text"].lstrip("#")
+    r, g, b = int(hex_color[:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+    return (
+        f'--ind-color: {c["color_text"]}; '
+        f'--ind-light: {c["color_light"]}; '
+        f'--ind-border: {c["color_border"]}; '
+        f'--ind-shadow: {c["shadow_color"]}; '
+        f'--ind-shadow-hover: rgba({r},{g},{b},0.25); '
+        f'--ind-link-bg: {c["color_bg"]}; '
+        f'--ind-link-text: {c["color_dark"]}; '
+        f'--ind-link-border: {c["color_border"]}; '
+        f'--ind-quote-bg: rgba({r},{g},{b},0.06); '
+        f'--ind-color-soft: rgba({r},{g},{b},0.4);'
+    )
+
+
+def build_node_content(node, node_idx, is_first):
+    """生成单个节点爆品的内容区域（node 结构：key/label/emoji/color/products/total）"""
+    products = node.get("products", [])
+    total = node.get("total", 0)
+    emoji = node.get("emoji", "🎁")
+    label = node.get("label", "")
+    key = node.get("key", "")
+    color = node.get("color", NODE_THEME["color"])
+    
+    active_cls = 'active' if is_first else ''
+    css_vars = build_css_vars(NODE_THEME)
+    
+    # 无数据 -> 占位
+    if not products:
+        return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
+    <!-- 空状态占位 -->
+    <div style="max-width: 1200px; margin: 20px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+      <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
+        <div style="font-size: 64px; margin-bottom: 20px;">{emoji}</div>
+        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: {color}; font-weight: 600;">{label} 爆品数据待填充</h3>
+        <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">节点数据到位后自动填充，敬请期待</p>
+      </div>
+    </div>
+  </div>'''
+    
+    # 有数据 -> 商品卡片平铺
+    cards = []
+    for item in products:
+        cards.append(build_product_card(item, emoji, NODE_THEME))
+    cards_html = "\n".join(cards)
+    
+    return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
+    <!-- 节点标题 -->
+    <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+      <div style="display: flex; align-items: center; justify-content: space-between; background-color: #ffffff; border-radius: 12px; padding: 16px 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0; border-left: 4px solid {color};">
+        <div style="font-size: 20px; font-weight: bold; color: #2d2a26; display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 26px;">{emoji}</span> {label}
+          <span style="background-color: {NODE_THEME["color_light"]}; color: {NODE_THEME["color_text"]}; font-size: 12px; padding: 2px 12px; border-radius: 12px; font-weight: bold; margin-left: 6px;">{total} 款爆品</span>
+        </div>
+        <div style="font-size: 12px; color: #8c8985;">节点限定 · 一期数据</div>
+      </div>
+    </div>
+    <!-- 商品卡片网格 -->
+    <div style="max-width: 1200px; margin: 18px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+      <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+{cards_html}
+      </div>
+    </div>
+  </div>'''
+
+
+def build_node_panel(nodes):
+    """生成节点爆品板块（节点 Tab + 节点内容）；nodes 为空时返回占位提示"""
+    if not nodes:
+        return '''  <!-- 节点爆品空状态 -->
+  <div style="max-width: 1200px; margin: 20px auto; padding: 0 10px; box-sizing: border-box;">
+    <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
+      <div style="font-size: 64px; margin-bottom: 20px;">🎁</div>
+      <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #c0392b; font-weight: 600;">节点爆品即将上线</h3>
+      <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">开学季、中秋节等营销节点爆品数据正在采集中</p>
+    </div>
+  </div>'''
+    
+    # 节点 Tab
+    node_tabs = []
+    for idx, node in enumerate(nodes):
+        cls = 'active-node-tab' if idx == 0 else ''
+        node_tabs.append(f'''    <div id="node-tab-{node["key"]}" onclick="switchNode('{node["key"]}', {idx})" class="node-tab {cls}" style="--node-color: {node.get("color", NODE_THEME["color"])};">
+      <span>{node["emoji"]}</span> {node["label"]}
+    </div>''')
+    node_tabs_html = "\n".join(node_tabs)
+    
+    # 节点内容
+    node_contents = []
+    for idx, node in enumerate(nodes):
+        node_contents.append(build_node_content(node, idx, idx == 0))
+    node_contents_html = "\n\n".join(node_contents)
+    
+    return f'''  <!-- 节点 Tab 栏 -->
+  <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+    <div class="node-tabs-mobile" style="display: flex; flex-wrap: wrap; gap: 10px; background-color: #ffffff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+{node_tabs_html}
+    </div>
+  </div>
+
+{node_contents_html}'''
+
+
+def build_versioned_html(versions, nodes):
+    """将所有数据源版本 + 节点爆品合并为最终HTML（顶层「常规爆品/节点爆品」Tab 切换）
+    versions: [{"key", "label", "industries_data", "html"}, ...]，第一个为默认显示
+    nodes: [{"key", "label", "emoji", "color", "products", "total"}, ...]，节点爆品列表（可为空）"""
+    
+    # 节点爆品板块（节点 Tab + 节点内容）
+    node_panel_html = build_node_panel(nodes)
     
     # 构建版本选择器选项 + 各版本内容块（剔除各自顶部海报框）
     version_options = []
@@ -1160,6 +1359,88 @@ def build_versioned_html(versions):
     .version-selector select:focus {{
       border-color: #1e293b;
       box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
+    }}
+
+    /* 一级 Tab（常规爆品 / 节点爆品） */
+    .panel-tabs {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }}
+    .panel-tab {{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: 800;
+      border-radius: 14px;
+      cursor: pointer;
+      user-select: none;
+      background: #ffffff;
+      color: #94a3b8;
+      border: 2px solid rgba(0,0,0,0.06);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    .panel-tab:hover {{
+      color: #475569;
+      border-color: rgba(0,0,0,0.12);
+    }}
+    .active-panel-tab {{
+      background: #1e293b !important;
+      color: #ffffff !important;
+      border-color: #1e293b !important;
+      box-shadow: 0 6px 16px rgba(30,41,59,0.18);
+    }}
+
+    /* 节点爆品 Tab */
+    .node-tab {{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      background: #faf9f5;
+      color: #94a3b8;
+      border: 1px solid #eeebe3;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }}
+    .node-tab:hover {{
+      color: #475569;
+      border-color: #cbd5e1;
+    }}
+    .active-node-tab {{
+      background: var(--node-color, #c0392b) !important;
+      color: #ffffff !important;
+      border-color: var(--node-color, #c0392b) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }}
+
+    /* 节点内容切换 */
+    .node-content {{
+      opacity: 0 !important;
+      transform: translateY(10px) !important;
+      display: none !important;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }}
+    .node-content.active {{
+      display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }}
+
+    /* 常规/节点板块切换 */
+    .top-panel {{
+      display: none;
+    }}
+    .top-panel.active-panel {{
+      display: block;
     }}
 
     /* 行业级 Tab */
@@ -1449,13 +1730,6 @@ def build_versioned_html(versions):
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
-      <!-- 版本筛选器（右上角） -->
-      <div class="version-selector" style="position: absolute; top: 16px; right: 20px; z-index: 1;">
-        <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1px solid #c9b88f; border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 10px center; outline: none; min-width: 140px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
-{version_select_html}
-        </select>
-      </div>
-
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.4;">
         <span class="poster-title-sub" style="font-size: 34px; font-weight: 700; letter-spacing: 2px;">pdd爆品榜单</span>
       </h1>
@@ -1466,8 +1740,32 @@ def build_versioned_html(versions):
     </div>
   </div>
 
-  <!-- 所有版本的内容块 -->
+  <!-- 一级 Tab：常规爆品 / 节点爆品 -->
+  <div style="max-width: 1200px; margin: 0 auto 22px auto; padding: 0 10px;">
+    <div class="panel-tabs">
+      <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
+      <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+    </div>
+  </div>
+
+  <!-- 常规爆品板块 -->
+  <div id="panel-regular" class="top-panel active-panel" style="width: 100%;">
+    <!-- 版本筛选器 -->
+    <div style="max-width: 1200px; margin: 0 auto 14px auto; padding: 0 10px; display: flex; justify-content: flex-end; box-sizing: border-box;">
+      <div class="version-selector">
+        <select id="version-select" onchange="switchVersion(this.value)" style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1.5px solid #c9b88f; border-radius: 10px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 600; color: #5a5347; cursor: pointer; background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); background-repeat: no-repeat; background-position: right 12px center; outline: none; min-width: 160px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">
+{version_select_html}
+        </select>
+      </div>
+    </div>
+    <!-- 所有版本的内容块 -->
 {all_versions_html}
+  </div>
+
+  <!-- 节点爆品板块 -->
+  <div id="panel-node" class="top-panel" style="width: 100%;">
+{node_panel_html}
+  </div>
 
   <!-- 图片放大查看模态层 -->
   <div id="image-modal" onclick="closeImageModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.85); z-index: 99999; cursor: zoom-out; align-items: center; justify-content: center; padding: 30px; box-sizing: border-box;">
@@ -1476,6 +1774,41 @@ def build_versioned_html(versions):
   </div>
 
   <script>
+    // 一级板块切换（常规爆品 / 节点爆品）
+    function switchPanel(panel) {{
+      const regularPanel = document.getElementById('panel-regular');
+      const nodePanel = document.getElementById('panel-node');
+      const regularTab = document.getElementById('panel-tab-regular');
+      const nodeTab = document.getElementById('panel-tab-node');
+      if (panel === 'regular') {{
+        regularPanel.classList.add('active-panel');
+        nodePanel.classList.remove('active-panel');
+        regularTab.classList.add('active-panel-tab');
+        nodeTab.classList.remove('active-panel-tab');
+      }} else {{
+        nodePanel.classList.add('active-panel');
+        regularPanel.classList.remove('active-panel');
+        nodeTab.classList.add('active-panel-tab');
+        regularTab.classList.remove('active-panel-tab');
+      }}
+    }}
+
+    // 节点切换
+    function switchNode(nodeKey, idx) {{
+      document.querySelectorAll('.node-content').forEach(c => {{
+        c.classList.remove('active');
+        c.style.display = 'none';
+      }});
+      document.querySelectorAll('.node-tab').forEach(t => t.classList.remove('active-node-tab'));
+      const target = document.getElementById('node-content-' + nodeKey);
+      if (target) {{
+        target.classList.add('active');
+        target.style.display = 'block';
+      }}
+      const activeTab = document.getElementById('node-tab-' + nodeKey);
+      if (activeTab) activeTab.classList.add('active-node-tab');
+    }}
+
     // 版本切换
     function switchVersion(key) {{
       const blocks = document.querySelectorAll('.version-block');
@@ -1644,12 +1977,29 @@ def main():
             "html": html,
         })
     
+    # 读取节点爆品数据
+    nodes = []
+    for node_src in NODE_SOURCES:
+        products = load_node_products(node_src)
+        nodes.append({
+            "key": node_src["key"],
+            "label": node_src["label"],
+            "emoji": node_src.get("emoji", "🎁"),
+            "color": node_src.get("color", NODE_THEME["color"]),
+            "products": products or [],
+            "total": len(products) if products else 0,
+        })
+        if products:
+            print(f"  节点[{node_src['label']}]: {len(products)}款爆品")
+        else:
+            print(f"  节点[{node_src['label']}]: 无数据（占位）")
+    
     output_dir = "/Users/krystalcao/Desktop/已完成"
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "多行业爆品选品报告.html")
     
     print("🔨 生成HTML...")
-    final_html = build_versioned_html(versions)
+    final_html = build_versioned_html(versions, nodes)
     
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(final_html)
