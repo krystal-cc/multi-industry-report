@@ -1384,12 +1384,12 @@ def build_versioned_html(versions, nodes):
     .panel-tab {{
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 9px 20px;
-      font-size: 15px;
+      gap: 8px;
+      padding: 11px 24px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: 0.3px;
-      border-radius: 12px;
+      border-radius: 13px;
       cursor: pointer;
       user-select: none;
       background: transparent;
@@ -1797,17 +1797,17 @@ def build_versioned_html(versions, nodes):
 
   <!-- 顶部总览 banner -->
   <div style="max-width: 1200px; margin: 0 auto 14px auto; padding: 0 10px;">
-    <div class="top-poster-mobile top-banner" style="border-radius: 18px; padding: 22px 28px; box-shadow: 0 8px 24px rgba(120,110,80,0.12), inset 0 1px 0 rgba(255,255,255,0.4);">
+    <div class="top-poster-mobile top-banner" style="border-radius: 20px; padding: 32px 36px; box-shadow: 0 10px 28px rgba(120,110,80,0.14), inset 0 1px 0 rgba(255,255,255,0.4);">
 
-      <div class="banner-inner" style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+      <div class="banner-inner" style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
         <!-- 左侧：标题区 -->
-        <div style="text-align: left; flex: 1 1 auto; min-width: 220px;">
-          <div style="font-size: 11px; font-weight: 600; letter-spacing: 3px; color: #8a6a2a; text-transform: uppercase; margin-bottom: 4px;">CID · TRENDING PICKS</div>
-          <h1 style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
-            <span class="poster-title-sub" style="font-size: 28px; font-weight: 800; letter-spacing: 2px; background: linear-gradient(135deg, #3d3527 0%, #6b5a3e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CID爆品榜单</span>
+        <div style="text-align: left; flex: 1 1 auto; min-width: 240px;">
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: 3.5px; color: #8a6a2a; text-transform: uppercase; margin-bottom: 6px;">CID · TRENDING PICKS</div>
+          <h1 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
+            <span class="poster-title-sub" style="font-size: 34px; font-weight: 800; letter-spacing: 2.5px; background: linear-gradient(135deg, #3d3527 0%, #6b5a3e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CID爆品榜单</span>
           </h1>
-          <div class="gold-line"></div>
-          <div class="banner-tag">覆盖4个行业 · 多个节点</div>
+          <div class="gold-line" style="margin: 12px 0 10px 0;"></div>
+          <div class="banner-tag" style="font-size: 13px; padding: 5px 14px;">覆盖4个行业 · 多个节点</div>
         </div>
         <!-- 右侧：一级 Tab（常规 / 节点） -->
         <div class="panel-tabs" style="margin: 0; flex: 0 0 auto;">
