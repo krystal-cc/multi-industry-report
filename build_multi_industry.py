@@ -1731,11 +1731,11 @@ def build_versioned_html(versions, nodes):
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.4;">
-        <span class="poster-title-sub" style="font-size: 34px; font-weight: 700; letter-spacing: 2px;">pdd爆品榜单</span>
+        <span class="poster-title-sub" style="font-size: 34px; font-weight: 700; letter-spacing: 2px;">CID爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
       <p id="poster-summary" style="margin: 0; font-size: 13px; color: #6b6147;">
-        覆盖 <span id="poster-industry-count">{len([i for i in default_industries if i["total"] > 0])}</span> 个行业 · 总计 <strong id="poster-total" style="color: #3d3527; font-size: 16px;">{sum(i["total"] for i in default_industries)}</strong> 款爆品
+        覆盖4个行业·多个节点
       </p>
     </div>
   </div>
