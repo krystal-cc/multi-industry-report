@@ -285,7 +285,7 @@
       background: linear-gradient(90deg, #c9b88f, #d4c39d, #c9b88f);
       background-size: 200% 100%;
       border-radius: 2px;
-      margin: 18px auto 12px auto;
+      margin: 10px 0 8px 0;
       animation: goldShimmer 3s ease-in-out infinite;
     }
     @keyframes goldShimmer {
@@ -384,13 +384,20 @@
       .top-poster-mobile h1 {
         font-size: 14px !important;
         line-height: 1.25 !important;
-        text-align: center !important;
+        text-align: left !important;
       }
       .top-poster-mobile h1 .poster-title-main {
         font-size: 17px !important;
       }
       .top-poster-mobile h1 .poster-title-sub {
         font-size: 22px !important;
+      }
+      .banner-inner {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .banner-inner .panel-tabs {
+        justify-content: center !important;
       }
       .product-card-mobile .card-image {
         width: 92px !important;
@@ -455,25 +462,27 @@
 
   <!-- 顶部总览海报（含版本筛选器） -->
   <div style="max-width: 1200px; margin: 0 auto 14px auto; padding: 0 10px;">
-    <div class="top-poster-mobile" style="background: #e8e2d0; color: #5a5347; border-radius: 16px; padding: 18px 24px; text-align: center; box-shadow: 0 6px 20px rgba(120,110,80,0.10); position: relative; overflow: hidden;">
+    <div class="top-poster-mobile" style="background: #e8e2d0; color: #5a5347; border-radius: 16px; padding: 18px 24px; box-shadow: 0 6px 20px rgba(120,110,80,0.10); position: relative; overflow: hidden;">
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
-      <h1 style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
-        <span class="poster-title-sub" style="font-size: 27px; font-weight: 700; letter-spacing: 2px;">CID爆品榜单</span>
-      </h1>
-      <div class="gold-line"></div>
-      <p id="poster-summary" style="margin: 0; font-size: 13px; color: #6b6147;">
-        覆盖4个行业·多个节点
-      </p>
-    </div>
-  </div>
-
-  <!-- 一级 Tab：常规爆品 / 节点爆品 -->
-  <div style="max-width: 1200px; margin: 0 auto 22px auto; padding: 0 10px;">
-    <div class="panel-tabs">
-      <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
-      <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+      <div class="banner-inner" style="position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+        <!-- 左侧：标题区 -->
+        <div style="text-align: left; flex: 1 1 auto; min-width: 200px;">
+          <h1 style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
+            <span class="poster-title-sub" style="font-size: 27px; font-weight: 700; letter-spacing: 2px;">CID爆品榜单</span>
+          </h1>
+          <div class="gold-line"></div>
+          <p id="poster-summary" style="margin: 0; font-size: 13px; color: #6b6147;">
+            覆盖4个行业·多个节点
+          </p>
+        </div>
+        <!-- 右侧：一级 Tab（常规 / 节点） -->
+        <div class="panel-tabs" style="margin: 0; flex: 0 0 auto;">
+          <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
+          <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+        </div>
+      </div>
     </div>
   </div>
 
