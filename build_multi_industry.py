@@ -1234,12 +1234,12 @@ def build_node_panel(nodes):
 
 
 def inject_date_filter_into_industry_row(body, version_key, version_options):
-    """在每个版本 body 的"行业级 Tab 切换"div 同行左侧注入日期筛选下拉。
-    把原 div 改造为 flex 容器：左=日期下拉，右=行业 Tab。
+    """在每个版本 body 的"行业级 Tab 切换"div 同行右侧注入日期筛选下拉。
+    保持原位置：左=行业 Tab，右=日期下拉（原本日期下拉就在右对齐）。
     version_options: [('<option ...>', ...)]，用于生成 select 选项。"""
     select_options_html = '\n'.join(version_options)
     date_select_html = (
-        '<div class="version-selector" style="flex: 0 0 auto;">\n'
+        '<div class="version-selector" style="flex: 0 0 auto; margin-left: auto;">\n'
         f'        <select id="version-select-{version_key}" onchange="switchVersion(this.value)" '
         'style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1.5px solid #c9b88f; border-radius: 10px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 600; color: #5a5347; cursor: pointer; '
         "background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); "
@@ -1248,27 +1248,21 @@ def inject_date_filter_into_industry_row(body, version_key, version_options):
         '        </select>\n'
         '      </div>'
     )
-    # 行业 Tab 容器改造为带 id 的可寻址容器
     # 原始结构：<div style="..." class="industry-content-wrapper"><div class="flex items-end ... gap-2 pl-2 ..." id="industry-tabs-container"> ... </div></div>
-    # 目标结构：把外层 div 改为 flex 容器，左侧注入日期下拉
-    # 简化做法：用正则匹配整个 industry-content-wrapper 块，替换为新版
+    # 目标结构：行业 Tab 在左、日期下拉在右，同一行 flex 布局
     pattern = re.compile(
         r'(<div\s+style="max-width:\s*1200px;\s*margin:\s*0\s+auto;\s*padding:\s*0\s+10px;"\s+class="industry-content-wrapper">\s*<div\s+class="flex\s+items-end\s+overflow-x-auto\s+no-scrollbar\s+gap-2\s+pl-2\s+select-none"\s+id="industry-tabs-container"[^>]*>)(.*?)(\s*</div>\s*</div>)',
         re.DOTALL
     )
     def _replace(m):
-        head = m.group(1)
         inner = m.group(2)
-        tail = m.group(3)
-        # 把原 head 中的 div 改造为 flex 容器，外层多包一层 flex div
         new_head = (
             '<div style="max-width: 1200px; margin: 0 auto; padding: 0 10px;" class="industry-content-wrapper">\n'
             '    <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">\n'
-            '      ' + date_select_html + '\n'
             '      <div class="flex items-end overflow-x-auto no-scrollbar gap-2 pl-2 select-none" '
             f'id="industry-tabs-container-{version_key}" style="flex: 1 1 auto; min-width: 0;">'
         )
-        new_tail = '\n    </div>\n  </div>'
+        new_tail = '\n      ' + date_select_html + '\n    </div>\n  </div>'
         return new_head + inner + new_tail
     new_body, n = pattern.subn(_replace, body, count=1)
     if n == 0:
