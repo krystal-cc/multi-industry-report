@@ -932,16 +932,16 @@ def build_product_card(item, cat_emoji, colors):
         # onerror 时把 img 隐藏，同时显示后面预置的 NO IMAGE 占位 div（高度自适应右侧总高度）
         # 图片支持点击放大：cursor: zoom-in + onclick 触发 showImageModal
         image_html = (
-            f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
+            f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
             f'onclick="showImageModal(this.src, event)" '
             f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
-            f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
+            f'<div class="card-noimage" style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
             f'<span style="font-size: 32px;">{cat_emoji}</span>'
             f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span>'
             f'</div>'
         )
     else:
-        image_html = f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span></div>'
+        image_html = f'<div class="card-noimage" style="width: 120px; height: 120px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span></div>'
     
     tags_html_parts = []
     for tag in tags:
@@ -952,9 +952,9 @@ def build_product_card(item, cat_emoji, colors):
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     
     return f'''    <!-- 商品卡片 -->
-    <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
+    <div class="product-card-mobile product-card" style="width: calc(33.333% - 10px); min-width: 280px; background-color: #ffffff; border-radius: 12px; padding: 12px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 10px; align-items: stretch;">
       {image_html}
-      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; justify-content: space-between;">
+      <div style="display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; justify-content: space-between;">
         <div>
           <div style="display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 4px;">
             {tags_html}
@@ -1025,7 +1025,7 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     </div>
     <div style="font-size: 12px; color: #8c8985;">分行业精选</div>
   </div>
-  <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 12px;">
 {cards_html}
   </div>
 </div>''')
@@ -1059,8 +1059,8 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     return f'''  <div id="industry-content-{version_key}-{ind_idx}" class="industry-content {active_cls} industry-content-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0 10px; box-sizing: border-box;">
 
     <!-- 爆品类目分布看板（每张卡片可点击切换品类，激活态为 Tab） -->
-    <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-top: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
-      <h3 style="margin: 0 0 15px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+    <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; margin-top: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+      <h3 style="margin: 0 0 12px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
         📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（点击卡片切换品类 ↓）</span>
       </h3>
       <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
@@ -1069,7 +1069,7 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     </div>
 
     <!-- 品类商品展示区 -->
-    <div style="margin-top: 25px;">
+    <div style="margin-top: 16px;">
       <div class="category-content-box bg-white rounded-2xl p-5 md:p-6 shadow-xl relative min-h-[400px]" style="border:2px solid {c["color_border"]};">
 {contents_html}
       </div>
@@ -1077,9 +1077,9 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
     </div>
 
     <!-- 爆品创意黄金法则与高频词 -->
-    <div style="max-width: 1180px; margin: 30px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
-      <div style="background-color: #ffffff; border-radius: 14px; padding: 22px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
-        <h3 style="margin: 0 0 15px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+    <div style="max-width: 1180px; margin: 20px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+      <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+        <h3 style="margin: 0 0 12px 0; font-size: 15px; color: {c["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">
           💡 爆品创意黄金法则与高频词
         </h3>
         
@@ -1186,7 +1186,7 @@ def build_node_content(node, node_idx, is_first):
     </div>
     <!-- 商品卡片网格 -->
     <div style="max-width: 1200px; margin: 18px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
-      <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px;">
 {cards_html}
       </div>
     </div>
@@ -1372,7 +1372,7 @@ def build_versioned_html(versions, nodes):
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 30px;
+      padding: 9px 22px;
       font-size: 16px;
       font-weight: 800;
       border-radius: 14px;
@@ -1725,13 +1725,13 @@ def build_versioned_html(versions, nodes):
 <body class="min-h-screen text-slate-800 antialiased pb-16">
 
   <!-- 顶部总览海报（含版本筛选器） -->
-  <div style="max-width: 1200px; margin: 0 auto 20px auto; padding: 0 10px;">
-    <div class="top-poster-mobile" style="background: #e8e2d0; color: #5a5347; border-radius: 20px; padding: 35px 30px; text-align: center; box-shadow: 0 6px 20px rgba(120,110,80,0.10); position: relative; overflow: hidden;">
+  <div style="max-width: 1200px; margin: 0 auto 14px auto; padding: 0 10px;">
+    <div class="top-poster-mobile" style="background: #e8e2d0; color: #5a5347; border-radius: 16px; padding: 18px 24px; text-align: center; box-shadow: 0 6px 20px rgba(120,110,80,0.10); position: relative; overflow: hidden;">
       <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
       <div style="position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
 
-      <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.4;">
-        <span class="poster-title-sub" style="font-size: 34px; font-weight: 700; letter-spacing: 2px;">CID爆品榜单</span>
+      <h1 style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
+        <span class="poster-title-sub" style="font-size: 27px; font-weight: 700; letter-spacing: 2px;">CID爆品榜单</span>
       </h1>
       <div class="gold-line"></div>
       <p id="poster-summary" style="margin: 0; font-size: 13px; color: #6b6147;">
