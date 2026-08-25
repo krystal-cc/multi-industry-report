@@ -19,6 +19,12 @@ INDUSTRY_ORDER = ["消电日百", "食品饮料", "美护", "服饰"]
 # sheets 为「行业名 -> sheet名匹配前缀」映射（新老数据的 sheet 命名不同）
 DATA_SOURCES = [
     {
+        "key": "0825",
+        "label": "8月25日更新",
+        "path": "/Users/krystalcao/Desktop/爆品榜单0825.xlsx",
+        "sheets": {"消电日百": "消电日百", "食品饮料": "食品饮料", "美护": "美妆个护", "服饰": "服饰"},
+    },
+    {
         "key": "0817",
         "label": "8月17日更新",
         "path": "/Users/krystalcao/Desktop/爆品榜单/【0817】爆品榜单.xlsx",
