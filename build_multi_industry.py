@@ -171,6 +171,23 @@ def find_sheet_name(excel_path, target_name):
             return s
     return None
 
+# 医疗器械类商品关键词（命中即删除，避免医疗广告类商品）
+MEDICAL_DEVICE_KEYWORDS = (
+    "血糖仪", "采血针", "磁疗贴", "远红外", "暖宫贴", "治疗仪", "艾灸贴",
+    "鸡眼膏", "鸡眼贴", "血氧仪", "血压计", "血压仪", "制氧机", "雾化器",
+    "助听器", "理疗仪", "医用敷料", "痔疮凝胶", "颈椎牵引",
+)
+
+
+def drop_medical_devices(df):
+    """删除医疗器械类商品（按商品名称关键词匹配）"""
+    if df.empty or "商品名称" not in df.columns:
+        return df
+    mask = ~df["商品名称"].astype(str).str.contains(
+        "|".join(MEDICAL_DEVICE_KEYWORDS), regex=True, na=False)
+    return df[mask].reset_index(drop=True)
+
+
 def read_sheet(excel_path, industry_name, sheet_prefix):
     """从指定 Excel 读取某行业 sheet（sheet_prefix 为 sheet 名匹配前缀）"""
     actual_name = find_sheet_name(excel_path, sheet_prefix)
@@ -179,6 +196,8 @@ def read_sheet(excel_path, industry_name, sheet_prefix):
     df = pd.read_excel(excel_path, actual_name)
     if df.empty:
         return None
+    # 删除医疗器械类商品
+    df = drop_medical_devices(df)
     # 合并过小的二级类目
     merge_map = INDUSTRY_MERGE.get(industry_name, {})
     if merge_map:
