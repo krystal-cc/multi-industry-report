@@ -959,7 +959,25 @@ def build_product_card(item, cat_emoji, colors):
     
     name_escaped = name.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
-    
+
+    # 链接有效性判断：缺失或占位符时显示“暂无相关数据”
+    def _valid_url(u):
+        s = str(u).strip() if u is not None else ""
+        return s not in ("", "#", "nan", "None", "null", "-", "暂无")
+
+    def _esc(u):
+        return str(u).replace('&', '&amp;').replace('"', '&quot;')
+
+    if _valid_url(video_link):
+        video_btn = f'<a href="{_esc(video_link)}" target="_blank" rel="noopener" class="btn-visit btn-video"><span class="btn-emoji">🎬</span> 播放视频</a>'
+    else:
+        video_btn = '<span class="btn-visit btn-video btn-disabled"><span class="btn-emoji">🎬</span> 暂无相关数据</span>'
+
+    if _valid_url(link):
+        link_btn = f'<a href="{_esc(link)}" target="_blank" rel="noopener" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>'
+    else:
+        link_btn = '<span class="btn-visit btn-link btn-disabled"><span class="btn-emoji">🔗</span> 暂无相关数据</span>'
+
     return f'''    <!-- 商品卡片 -->
     <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
       {image_html}
@@ -976,8 +994,8 @@ def build_product_card(item, cat_emoji, colors):
           "{copy_text}"
         </div>
         <div style="display: flex; gap: 6px;">
-          <a href="{video_link}" target="_blank" class="btn-visit btn-video"><span class="btn-emoji">🎬</span> 播放视频</a>
-          <a href="{link}" target="_blank" class="btn-visit btn-link"><span class="btn-emoji">🔗</span> 直达链路</a>
+          {video_btn}
+          {link_btn}
         </div>
       </div>
     </div>'''
@@ -1734,6 +1752,19 @@ def build_versioned_html(versions, nodes):
       box-shadow: 0 4px 14px var(--ind-shadow-hover);
     }}
     .btn-link:hover .btn-emoji {{ filter: brightness(0) invert(1); }}
+    /* 链接缺失时的禁用态 */
+    .btn-visit.btn-disabled {{
+      background-color: #f4f2ee;
+      color: #b5b1a8;
+      border: 1px dashed #d6d2c8;
+      box-shadow: none;
+      cursor: default;
+      pointer-events: none;
+    }}
+    .btn-visit.btn-disabled .btn-emoji {{
+      filter: grayscale(1);
+      opacity: 0.55;
+    }}
 
     /* 商品标题行高优化 */
     .product-title {{
