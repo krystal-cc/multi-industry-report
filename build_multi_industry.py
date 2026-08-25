@@ -952,7 +952,16 @@ def build_product_card(item, cat_emoji, colors):
     else:
         image_html = f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);"><span style="font-size: 32px;">{cat_emoji}</span><span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span></div>'
     
-    tags_html_parts = []
+    # 平台标签（京东/拼多多），放在所有标签最前面
+    source_lower = (source or "").strip().lower()
+    if source_lower in ("jd", "京东", "jingdong", "京东商城"):
+        platform_label = '<span style="background-color: #e1251b; color: #ffffff; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-right: 4px; font-weight: 700;">京东</span>'
+    elif source_lower in ("pdd", "拼多多", "pinduoduo"):
+        platform_label = '<span style="background-color: #ff6a1a; color: #ffffff; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-right: 4px; font-weight: 700;">拼多多</span>'
+    else:
+        platform_label = ""
+
+    tags_html_parts = [platform_label] if platform_label else []
     for tag in tags:
         tags_html_parts.append(f'<span style="background-color: {c_light}; color: {c_text}; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-right: 4px; font-weight: 500;">{tag}</span>')
     tags_html = "".join(tags_html_parts)
