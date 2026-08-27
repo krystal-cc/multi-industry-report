@@ -1076,12 +1076,16 @@ def build_industry_content(ind, ind_idx, is_first, version_key):
         top_margin = '1px'
         show_cls = 'folder-show' if cat_i == 0 else ''
         tab_contents.append(f'''    <div id="tab-content-{version_key}-{ind_idx}-{cat_i}" class="folder-content {show_cls}">
-  <div style="margin-top: {top_margin}; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px;">
+  <div style="margin-top: {top_margin}; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px; gap: 12px; flex-wrap: wrap;">
     <div style="font-size: 18px; font-weight: bold; color: {c["color_dark"]}; display: flex; align-items: center; gap: 8px;">
       <span style="font-size: 22px;">{cat["emoji"]}</span> {cat["name"]}
       <span style="background-color: #eae7e0; color: #5c5a56; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: normal; margin-left: 6px;">{cat["count"]} 款爆品</span>
     </div>
-    <div style="font-size: 12px; color: #8c8985;">分行业精选</div>
+    <div class="platform-tabs">
+      <div class="platform-tab active-platform-tab" data-platform="all" onclick="switchPlatform('all', this)">全部</div>
+      <div class="platform-tab" data-platform="pdd" onclick="switchPlatform('pdd', this)">拼多多</div>
+      <div class="platform-tab" data-platform="jd" onclick="switchPlatform('jd', this)">京东</div>
+    </div>
   </div>
   <div style="display: flex; flex-wrap: wrap; gap: 15px;">
 {cards_html}
@@ -1517,49 +1521,50 @@ def build_versioned_html(versions, nodes):
       box-shadow: 0 6px 16px rgba(138,106,42,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
     }}
 
-    /* 平台筛选 Tab（全部 / 拼多多 / 京东） */
+    /* 平台筛选 Tab（全部 / 拼多多 / 京东） - 内嵌在每个品类框标题栏右侧 */
     .platform-tabs {{
       display: inline-flex;
       flex-wrap: wrap;
       gap: 4px;
-      padding: 5px;
-      background: rgba(255,255,255,0.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.7);
-      box-shadow: 0 4px 14px rgba(120,110,80,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+      padding: 3px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 12px;
+      border: 1px solid rgba(184,153,104,0.25);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
     }}
     .platform-tab {{
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      font-size: 13px;
+      gap: 4px;
+      padding: 5px 12px;
+      font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.2px;
-      border-radius: 11px;
+      border-radius: 8px;
       cursor: pointer;
       user-select: none;
       background: transparent;
       color: #8a6a2a;
-      border: 1px solid rgba(184,153,104,0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      transition: all 0.25s ease;
+      white-space: nowrap;
     }}
     .platform-tab:hover:not(.active-platform-tab) {{
       color: #5a4a2a;
-      background: rgba(255,255,255,0.7);
-      border-color: rgba(184,153,104,0.5);
+      background: rgba(255,255,255,0.85);
+      border-color: rgba(184,153,104,0.35);
     }}
     .active-platform-tab {{
       background: linear-gradient(135deg, #b89968 0%, #8a6a2a 100%) !important;
       color: #ffffff !important;
       border-color: #8a6a2a !important;
-      box-shadow: 0 6px 16px rgba(138,106,42,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+      box-shadow: 0 3px 10px rgba(138,106,42,0.3);
     }}
-    /* 平台筛选：按 body 的 data-platform 属性过滤商品卡片（纯 CSS，切换行业/版本自动生效） */
-    body[data-platform="pdd"] .product-card:not([data-platform="pdd"]) {{ display: none !important; }}
-    body[data-platform="jd"] .product-card:not([data-platform="jd"]) {{ display: none !important; }}
+    /* 平台筛选：基于当前品类容器 .folder-content 的 data-platform 属性过滤（纯 CSS） */
+    .folder-content[data-platform="pdd"] .product-card:not([data-platform="pdd"]) {{ display: none !important; }}
+    .folder-content[data-platform="jd"] .product-card:not([data-platform="jd"]) {{ display: none !important; }}
 
     /* 节点爆品 Tab */
     .node-tab {{
@@ -1973,17 +1978,10 @@ def build_versioned_html(versions, nodes):
           <div class="gold-line" style="margin: 12px 0 10px 0;"></div>
           <div class="banner-tag" style="font-size: 13px; padding: 5px 14px;">覆盖4个行业 · 多个节点</div>
         </div>
-        <!-- 右侧：一级 Tab（常规 / 节点）+ 平台筛选 Tab（全部 / 拼多多 / 京东） -->
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 0 0 auto;">
-          <div class="panel-tabs" style="margin: 0;">
-            <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
-            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
-          </div>
-          <div class="platform-tabs" id="platform-tabs">
-            <div id="platform-tab-all" onclick="switchPlatform('all')" class="platform-tab active-platform-tab">全部</div>
-            <div id="platform-tab-pdd" onclick="switchPlatform('pdd')" class="platform-tab">拼多多</div>
-            <div id="platform-tab-jd" onclick="switchPlatform('jd')" class="platform-tab">京东</div>
-          </div>
+        <!-- 右侧：一级 Tab（常规 / 节点） -->
+        <div class="panel-tabs" style="margin: 0; flex: 0 0 auto;">
+          <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
+          <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
         </div>
       </div>
     </div>
@@ -2007,12 +2005,14 @@ def build_versioned_html(versions, nodes):
   </div>
 
   <script>
-    // 平台筛选（全部 / 拼多多 / 京东）：纯 CSS 过滤，通过 body[data-platform] 控制
-    function switchPlatform(platform) {{
-      document.body.setAttribute('data-platform', platform);
-      document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active-platform-tab'));
-      const tab = document.getElementById('platform-tab-' + platform);
-      if (tab) tab.classList.add('active-platform-tab');
+    // 平台筛选（全部 / 拼多多 / 京东）：基于品类容器 .folder-content 的 data-platform 过滤
+    function switchPlatform(platform, tabEl) {{
+      const container = tabEl.closest('.folder-content');
+      if (!container) return;
+      container.setAttribute('data-platform', platform);
+      container.querySelectorAll('.platform-tab').forEach(t => {{
+        t.classList.toggle('active-platform-tab', t.getAttribute('data-platform') === platform);
+      }});
     }}
 
     // 一级板块切换（常规爆品 / 节点爆品）
