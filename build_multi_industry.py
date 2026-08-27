@@ -15,6 +15,10 @@ from collections import Counter
 # 行业展示顺序
 INDUSTRY_ORDER = ["消电日百", "食品饮料", "美护", "服饰"]
 
+# 意见反馈：腾讯问卷填写链接（创建问卷后，把链接填到下面，重新运行脚本即可生效）
+# 示例：https://wj.qq.com/s2/123456/abcd/
+FEEDBACK_URL = ""
+
 # 数据源配置：每个数据源对应一个时间版本（列表顺序决定默认显示顺序，第一个为默认显示）
 # sheets 为「行业名 -> sheet名匹配前缀」映射（新老数据的 sheet 命名不同）
 DATA_SOURCES = [
@@ -1383,7 +1387,11 @@ def build_versioned_html(versions, nodes):
     
     # 默认版本（第一个）的行业数据，用于顶部海报总计
     default_industries = versions[0]["industries_data"]
-    
+
+    # 意见反馈按钮：链接已配置时跳转问卷，未配置时给出提示
+    feedback_href = FEEDBACK_URL if FEEDBACK_URL else "#"
+    feedback_onclick = "" if FEEDBACK_URL else ' onclick="alert(\'反馈问卷地址待配置\'); return false;"'
+
     html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1477,6 +1485,34 @@ def build_versioned_html(versions, nodes):
     .version-selector select:focus {{
       border-color: #1e293b;
       box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
+    }}
+
+    /* 意见反馈按钮（顶部 banner 右上角） */
+    .feedback-btn {{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #6b5a3e;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(184,153,104,0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }}
+    .feedback-btn:hover {{
+      color: #3d3527;
+      background: #ffffff;
+      border-color: #b89968;
+      box-shadow: 0 4px 12px rgba(120,110,80,0.16);
+      transform: translateY(-1px);
     }}
 
     /* 一级 Tab（常规爆品 / 节点爆品） */
@@ -1914,6 +1950,9 @@ def build_versioned_html(versions, nodes):
         flex-direction: column !important;
         align-items: stretch !important;
       }}
+      .banner-actions {{
+        align-items: center !important;
+      }}
       .banner-inner .panel-tabs {{
         justify-content: center !important;
       }}
@@ -1991,10 +2030,13 @@ def build_versioned_html(versions, nodes):
           <div class="gold-line" style="margin: 12px 0 10px 0;"></div>
           <div class="banner-tag" style="font-size: 13px; padding: 5px 14px;">覆盖4个行业 · 多个节点</div>
         </div>
-        <!-- 右侧：一级 Tab（常规 / 节点） -->
-        <div class="panel-tabs" style="margin: 0; flex: 0 0 auto;">
-          <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
-          <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+        <!-- 右侧：意见反馈 + 一级 Tab（常规 / 节点） -->
+        <div class="banner-actions" style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+          <a class="feedback-btn" href="{feedback_href}" target="_blank" rel="noopener noreferrer"{feedback_onclick}>💬 意见反馈</a>
+          <div class="panel-tabs" style="margin: 0;">
+            <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
+            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+          </div>
         </div>
       </div>
     </div>
