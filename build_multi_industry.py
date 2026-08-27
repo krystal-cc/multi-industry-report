@@ -1527,12 +1527,12 @@ def build_versioned_html(versions, nodes):
       flex-wrap: wrap;
       gap: 4px;
       padding: 3px;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.6);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border-radius: 12px;
-      border: 1px solid rgba(184,153,104,0.25);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
     }}
     .platform-tab {{
       display: inline-flex;
@@ -1546,21 +1546,34 @@ def build_versioned_html(versions, nodes):
       cursor: pointer;
       user-select: none;
       background: transparent;
-      color: #8a6a2a;
+      color: #6b5a3e;
       border: 1px solid transparent;
       transition: all 0.25s ease;
       white-space: nowrap;
     }}
     .platform-tab:hover:not(.active-platform-tab) {{
       color: #5a4a2a;
-      background: rgba(255,255,255,0.85);
-      border-color: rgba(184,153,104,0.35);
+      background: rgba(255,255,255,0.9);
+      border-color: rgba(0,0,0,0.08);
     }}
-    .active-platform-tab {{
-      background: linear-gradient(135deg, #b89968 0%, #8a6a2a 100%) !important;
-      color: #ffffff !important;
-      border-color: #8a6a2a !important;
-      box-shadow: 0 3px 10px rgba(138,106,42,0.3);
+    /* 激活态：与商品卡片平台标签同款低饱和色，形成视觉呼应 */
+    .active-platform-tab[data-platform="all"] {{
+      background: #efeae0;
+      color: #6b5a3e;
+      border-color: #d8cbb2;
+      box-shadow: 0 2px 8px rgba(107,90,62,0.12);
+    }}
+    .active-platform-tab[data-platform="pdd"] {{
+      background: #f8efe2;
+      color: #a97e4f;
+      border-color: #e9d7bd;
+      box-shadow: 0 2px 8px rgba(169,126,79,0.15);
+    }}
+    .active-platform-tab[data-platform="jd"] {{
+      background: #f6e9e9;
+      color: #a86464;
+      border-color: #e8cfcf;
+      box-shadow: 0 2px 8px rgba(168,100,100,0.15);
     }}
     /* 平台筛选：基于当前品类容器 .folder-content 的 data-platform 属性过滤（纯 CSS） */
     .folder-content[data-platform="pdd"] .product-card:not([data-platform="pdd"]) {{ display: none !important; }}
