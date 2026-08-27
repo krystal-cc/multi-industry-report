@@ -974,10 +974,13 @@ def build_product_card(item, cat_emoji, colors):
     # 平台标签（京东/拼多多），低饱和色系，放在所有标签最前面
     source_lower = (source or "").strip().lower()
     if source_lower in ("jd", "京东", "jingdong", "京东商城"):
+        platform_type = "jd"
         platform_label = '<span style="background-color: #f6e9e9; color: #a86464; border: 1px solid #e8cfcf; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-right: 4px; font-weight: 600;">京东</span>'
     elif source_lower in ("pdd", "拼多多", "pinduoduo"):
+        platform_type = "pdd"
         platform_label = '<span style="background-color: #f8efe2; color: #a97e4f; border: 1px solid #e9d7bd; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-right: 4px; font-weight: 600;">拼多多</span>'
     else:
+        platform_type = "other"
         platform_label = ""
 
     tags_html_parts = [platform_label] if platform_label else []
@@ -1007,7 +1010,7 @@ def build_product_card(item, cat_emoji, colors):
         link_btn = '<span class="btn-visit btn-link btn-disabled"><span class="btn-emoji">🔗</span> 暂无相关数据</span>'
 
     return f'''    <!-- 商品卡片 -->
-    <div class="product-card-mobile product-card" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
+    <div class="product-card-mobile product-card" data-platform="{platform_type}" style="width: calc(50% - 8px); min-width: 330px; background-color: #ffffff; border-radius: 12px; padding: 14px; box-sizing: border-box; box-shadow: 0 3px 10px rgba(0,0,0,0.015); border: 1px solid #eeebe3; display: flex; gap: 12px; align-items: stretch;">
       {image_html}
       <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; justify-content: space-between;">
         <div>
@@ -1514,6 +1517,50 @@ def build_versioned_html(versions, nodes):
       box-shadow: 0 6px 16px rgba(138,106,42,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
     }}
 
+    /* 平台筛选 Tab（全部 / 拼多多 / 京东） */
+    .platform-tabs {{
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 5px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 4px 14px rgba(120,110,80,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+    }}
+    .platform-tab {{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      border-radius: 11px;
+      cursor: pointer;
+      user-select: none;
+      background: transparent;
+      color: #8a6a2a;
+      border: 1px solid rgba(184,153,104,0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    .platform-tab:hover:not(.active-platform-tab) {{
+      color: #5a4a2a;
+      background: rgba(255,255,255,0.7);
+      border-color: rgba(184,153,104,0.5);
+    }}
+    .active-platform-tab {{
+      background: linear-gradient(135deg, #b89968 0%, #8a6a2a 100%) !important;
+      color: #ffffff !important;
+      border-color: #8a6a2a !important;
+      box-shadow: 0 6px 16px rgba(138,106,42,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+    }}
+    /* 平台筛选：按 body 的 data-platform 属性过滤商品卡片（纯 CSS，切换行业/版本自动生效） */
+    body[data-platform="pdd"] .product-card:not([data-platform="pdd"]) {{ display: none !important; }}
+    body[data-platform="jd"] .product-card:not([data-platform="jd"]) {{ display: none !important; }}
+
     /* 节点爆品 Tab */
     .node-tab {{
       display: inline-flex;
@@ -1926,10 +1973,17 @@ def build_versioned_html(versions, nodes):
           <div class="gold-line" style="margin: 12px 0 10px 0;"></div>
           <div class="banner-tag" style="font-size: 13px; padding: 5px 14px;">覆盖4个行业 · 多个节点</div>
         </div>
-        <!-- 右侧：一级 Tab（常规 / 节点） -->
-        <div class="panel-tabs" style="margin: 0; flex: 0 0 auto;">
-          <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
-          <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+        <!-- 右侧：一级 Tab（常规 / 节点）+ 平台筛选 Tab（全部 / 拼多多 / 京东） -->
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 0 0 auto;">
+          <div class="panel-tabs" style="margin: 0;">
+            <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
+            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+          </div>
+          <div class="platform-tabs" id="platform-tabs">
+            <div id="platform-tab-all" onclick="switchPlatform('all')" class="platform-tab active-platform-tab">全部</div>
+            <div id="platform-tab-pdd" onclick="switchPlatform('pdd')" class="platform-tab">拼多多</div>
+            <div id="platform-tab-jd" onclick="switchPlatform('jd')" class="platform-tab">京东</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1953,6 +2007,14 @@ def build_versioned_html(versions, nodes):
   </div>
 
   <script>
+    // 平台筛选（全部 / 拼多多 / 京东）：纯 CSS 过滤，通过 body[data-platform] 控制
+    function switchPlatform(platform) {{
+      document.body.setAttribute('data-platform', platform);
+      document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active-platform-tab'));
+      const tab = document.getElementById('platform-tab-' + platform);
+      if (tab) tab.classList.add('active-platform-tab');
+    }}
+
     // 一级板块切换（常规爆品 / 节点爆品）
     function switchPanel(panel) {{
       const regularPanel = document.getElementById('panel-regular');
