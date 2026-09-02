@@ -74,6 +74,100 @@ NODE_THEME = {
     "shadow_color": "rgba(192,57,43,0.15)",
 }
 
+# ================= 小店爆品「商品名关键词自动归类」规则库 =================
+# 小店数据无类目字段，用商品名关键词推断二级类目（按行业分别维护）。
+# 结构：行业名 -> [ (类目名, emoji, [关键词...]), ... ]，顺序即匹配优先级（先命中先归类，未命中归“其他”）。
+NODE_CATEGORY_RULES = {
+    "消电日百": [
+        ("手机数码配件", "📱", ["手机", "充电", "耳机", "蓝牙", "平板", "数据线", "声卡", "翻译机",
+                              "学习机", "音响", "路由器", "智能手表", "手环", "键盘", "鼠标", "充电宝",
+                              "磁吸", "摄像头", "监控", "相机", "拍学", "早教"]),
+        ("厨房电器", "🔌", ["电饭煲", "空气炸锅", "榨汁", "破壁", "电磁炉", "养生壶", "热水壶",
+                         "烤箱", "微波炉", "豆浆机", "电压力锅", "煮蛋器"]),
+        ("厨具餐具", "🍳", ["炒锅", "平底锅", "砂锅", "炖锅", "煮锅", "煎锅", "电煮锅", "锅", "灶",
+                         "菜刀", "剪刀", "剪", "砧板", "保鲜盒", "保鲜袋", "保鲜膜", "保温杯",
+                         "泡茶杯", "茶饮杯", "碗", "盘", "铲", "刀具", "杯", "筷", "虾线"]),
+        ("生活小家电", "🌀", ["熨烫", "挂烫", "熨斗", "吸尘", "扫地机", "除螨", "加湿器", "风扇",
+                          "取暖", "吹风机", "烘干", "暖风", "净水", "直饮", "滤水"]),
+        ("家居日用", "🛋️", ["收纳", "置物", "衣架", "挂钩", "拖把", "扫把", "扫帚", "清洁刷",
+                          "抹布", "刮头", "垃圾桶", "伞", "坐墩", "换鞋凳", "摆件", "挂画",
+                          "装饰画", "地毯", "抱枕", "花洒", "顶喷", "卫浴", "淋浴", "灯", "美缝",
+                          "香囊", "香包", "钥匙扣", "挂件", "饰品", "支架"]),
+        ("家纺床品", "🛏️", ["床单", "被套", "枕头", "四件套", "被子", "被", "坐垫", "凉席",
+                          "巾", "浴巾", "毛巾", "鹅绒", "被芯", "床"]),
+        ("健康个护", "🧘", ["护腰", "护颈", "护腕", "头枕", "腰靠", "腰枕", "午睡枕", "趴睡枕",
+                         "睡眠枕", "助眠", "睡眠", "耳塞", "止鼾", "按摩梳", "眼贴", "眼罩",
+                         "背背佳", "开肩", "护臀", "颈枕", "剃须", "刮胡", "关节", "揉腹",
+                         "足贴", "热敷", "指甲", "体态"]),
+        ("文具办公", "✏️", ["铅笔", "错题本", "字帖", "手抄报", "马克笔", "书夹", "速写本",
+                         "描摹", "本子", "写字", "绘画", "涂色", "文具", "练字", "笔"]),
+    ],
+    "食品饮料": [
+        ("酒类", "🍷", ["酒", "威士忌", "白酒", "红酒", "葡萄酒", "鸡尾酒", "果酒", "干红"]),
+        ("水饮冲调", "🥤", ["饮料", "饮品", "乳酸菌", "咖啡", "奶茶", "茶饮", "果汁", "酸奶",
+                         "牛奶", "奶粉", "乳粉", "驼乳", "驼奶", "麦片", "燕麦", "冲调", "豆浆",
+                         "芝麻糊", "奶昔", "冲泡"]),
+        ("休闲零食", "🍪", ["零食", "薯片", "饼干", "坚果", "糖果", "巧克力", "辣条", "果干",
+                         "糕点", "面包", "花生", "板栗", "栗子", "瓜子", "解馋", "酥"]),
+        ("花草茶饮", "🍵", ["罗汉果", "胖大海", "雪梨", "蒲公英", "菊花", "玫瑰", "栀子",
+                         "橘皮", "茶包", "养生茶", "梨膏糖", "茶"]),
+        ("粮油调味", "🌾", ["面粉", "酵母", "自发粉", "油", "酱油", "调味", "盐", "糖", "酱", "料包"]),
+        ("生鲜冷冻", "🥩", ["番茄", "西红柿", "水果", "蔬菜", "竹荪", "菌", "猪", "鸡", "骨", "蹄",
+                         "虾", "海带", "肉", "蛋", "冷冻", "鱼丸", "鱼排", "海兔", "鳗鱼", "披萨",
+                         "泡菜", "柚子", "蜜柚", "海鲜", "干货"]),
+        ("营养滋补", "💪", ["辅酶Q10", "灵芝", "孢子粉", "红参", "高丽参", "人参", "天麻", "黄精",
+                         "红景天", "陈皮", "莲子", "蜂蜜", "麦卢卡", "燕窝", "阿胶", "枸杞", "滋补",
+                         "软胶囊", "益生菌", "代餐", "海参", "刺参", "保健品", "减肥", "营养", "蛋白",
+                         "维生素", "钙"]),
+        ("宠物食品", "🐾", ["猫", "狗", "化毛", "猫粮", "狗粮", "宠物"]),
+    ],
+    "美护": [
+        ("家清消毒", "🧼", ["消毒", "除菌", "洁厕", "清洁剂", "去渍", "油渍", "污渍", "除臭",
+                          "除味", "马桶", "清洁", "渗透剂", "湿巾", "纸巾", "衣物", "香薰", "香氛",
+                          "空气清新", "除醛", "净化器"]),
+        ("口腔护理", "🦷", ["牙膏", "牙刷", "漱口水"]),
+        ("洗护/身体护理", "🛁", ["洗发", "沐浴", "身体乳", "护发", "私密", "凝胶", "安睡裤",
+                           "安心裤", "卫生巾", "姨妈", "生理期", "止汗", "净味"]),
+        ("面部护肤", "🧴", ["水乳", "精华", "面霜", "面膜", "泥膜", "眼霜", "洁面", "喷雾",
+                         "护肤", "抗皱", "紧致", "淡纹", "提拉", "美颜膏", "焕亮", "保湿", "补水",
+                         "嫩肤", "肌肤", "水光", "童颜", "焕能", "美白", "淡斑", "精粹", "细胞油",
+                         "水解", "海绵", "液"]),
+        ("彩妆", "💄", ["口红", "唇釉", "粉底", "眼影", "腮红", "遮瑕", "眉笔", "彩妆", "睫毛", "眼线"]),
+        ("染发美发", "💇", ["染发", "染发膏", "染发乳", "染发梳", "染", "发型", "补色", "白发"]),
+        ("香水香氛", "🌸", ["香水"]),
+    ],
+    "服饰": [
+        ("内衣家居", "🩲", ["文胸", "内裤", "内衣", "裤袜", "连裤袜", "秋裤", "秋衣", "安全裤",
+                         "收腹", "塑形", "睡衣", "家居服", "袜", "奶皮裤", "保暖裤", "校服",
+                         "打底衫", "吊带", "bra"]),
+        ("男装", "👔", ["男士", "男款", "男装", "POLO", "衬衫", "夹克", "卫衣", "针织衫", "开衫"]),
+        ("鞋靴", "👟", ["鞋", "靴", "棉鞋", "雪地靴", "老人鞋", "足弓", "鞋垫"]),
+        ("女装", "👗", ["女", "裙", "连衣裙", "外套", "裤", "T恤", "上衣"]),
+        ("配饰", "💍", ["手链", "首饰", "帽", "围巾", "腰带", "眼镜", "老花镜", "串珠", "手串",
+                     "金珠", "翡翠", "玉", "手镯", "吊坠", "项链", "戒指", "发夹", "抓夹", "包",
+                     "行李箱", "斜挎", "珠子", "挂饰", "中国结"]),
+    ],
+}
+
+
+def classify_node_product(industry, name):
+    """根据商品名关键词推断小店商品的二级类目；未命中归“其他”。"""
+    name = name or ""
+    for cat_name, _emoji, keywords in NODE_CATEGORY_RULES.get(industry, []):
+        for kw in keywords:
+            if kw in name:
+                return cat_name
+    return "其他"
+
+
+def get_node_cat_emoji(industry, cat_name):
+    """返回小店类目的 emoji（优先从规则库取，找不到用 CAT_EMOJI_MAP，再回退📦）。"""
+    for cat_name2, emoji, _kw in NODE_CATEGORY_RULES.get(industry, []):
+        if cat_name2 == cat_name:
+            return emoji
+    return CAT_EMOJI_MAP.get(cat_name, "📦")
+
+
 # 二级行业归类映射（合并过小的类目）
 INDUSTRY_MERGE = {
     "服饰": {
@@ -241,7 +335,9 @@ def load_node_products(node_source):
     小店字段映射：商品名=微信小店商品ID(翻译后)、文案=创意文案(第一部分)、
     视频=素材URL(创意唯一)、GMV=综合GMV(全部广告)(元)。
     小店数据无商品主图、无引流平台、无落地页链接，均用占位处理。
+    类目：因小店数据无类目字段，用商品名关键词自动归类（NODE_CATEGORY_RULES）。
     """
+    label = node_source.get("label", "")
     path = node_source.get("path", "")
     if not path or not os.path.exists(path):
         return None
@@ -275,6 +371,7 @@ def load_node_products(node_source):
             "video_link": video_str,
             "link": "#",              # 小店无落地页 -> 直达链路显示“暂无相关数据”
             "video_cover": True,      # 标记：主图位用素材视频首帧填充（仅小店）
+            "category": classify_node_product(label, name_str),  # 商品名关键词自动归类
         })
     return products
 
@@ -1235,11 +1332,56 @@ def build_node_content(node, node_idx, is_first):
     </div>
   </div>'''
 
-    # 有数据 -> 商品卡片平铺
-    cards = []
+    # 有数据 -> 按类目分组（数量降序，"其他"放最后）
+    cat_map = {}
     for item in products:
-        cards.append(build_product_card(item, emoji, theme))
-    cards_html = "\n".join(cards)
+        cat_map.setdefault(item.get("category", "其他"), []).append(item)
+    cat_items = list(cat_map.items())
+    cat_items.sort(key=lambda kv: (kv[0] == "其他", -len(kv[1])))
+
+    # 类目分布看板（每张卡片可点击切换 = 兼具 Tab 功能）
+    dist_cards = []
+    for cat_i, (cat_name, cat_products) in enumerate(cat_items):
+        cat_count = len(cat_products)
+        cat_emoji = get_node_cat_emoji(label, cat_name)
+        is_first_cat = (cat_i == 0)
+        if is_first_cat:
+            card_style = f'background-color: {theme["color_bg"]}; border: 1.5px solid {theme["color_deep"]};'
+            num_color = theme["color_deep"]
+        else:
+            card_style = 'background-color: #faf9f5; border: 1px solid #eeebe3;'
+            num_color = theme["color_text"]
+        pct = f"{cat_count/total*100:.1f}%" if total else "0%"
+        dist_cards.append(f'''      <div id="node-tab-header-{key}-{cat_i}" onclick="switchNodeCategory('{key}',{cat_i})" data-color-deep="{theme["color_deep"]}" data-color-text="{theme["color_text"]}" data-color-bg="{theme["color_bg"]}" data-shadow="{theme["shadow_color"]}" class="dist-card" style="flex: 1; min-width: 100px; {card_style} border-radius: 8px; padding: 8px 10px; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: {'0 2px 8px ' + theme["shadow_color"] if is_first_cat else 'none'};" onmouseover="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#fff';this.style.borderColor='{theme["color_text"]}';this.style.boxShadow='0 2px 8px {theme["shadow_color"]}';}}" onmouseout="if(!this.classList.contains('active-dist-card')){{this.style.backgroundColor='#faf9f5';this.style.borderColor='#eeebe3';this.style.boxShadow='none';}}">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 3px; white-space: nowrap; overflow: hidden;">
+          <span style="font-size: 14px;">{cat_emoji}</span>
+          <span style="font-size: 11px; color: #5c5a56; font-weight: 500; overflow: hidden; text-overflow: ellipsis;">{cat_name}</span>
+        </div>
+        <div style="font-size: 12px; color: {num_color}; font-weight: bold; white-space: nowrap;"><span class="dist-card-num" style="font-weight: bold;">{cat_count}</span><span style="font-size: 9px; font-weight: normal; color: #9c9995; margin: 0 3px;">款</span><span style="font-size: 9px; font-weight: normal; color: #9c9995;">{pct}</span></div>
+      </div>''')
+    dist_html = "\n".join(dist_cards)
+
+    # 类目商品展示区
+    tab_contents = []
+    for cat_i, (cat_name, cat_products) in enumerate(cat_items):
+        cat_emoji = get_node_cat_emoji(label, cat_name)
+        cards = []
+        for item in cat_products:
+            cards.append(build_product_card(item, cat_emoji, theme))
+        cards_html = "\n".join(cards)
+        show_cls = 'folder-show' if cat_i == 0 else ''
+        tab_contents.append(f'''    <div id="node-tab-content-{key}-{cat_i}" class="folder-content {show_cls}">
+  <div style="margin-top: 1px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #eae7e0; padding-bottom: 8px; gap: 12px; flex-wrap: wrap;">
+    <div style="font-size: 18px; font-weight: bold; color: {theme["color_dark"]}; display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 22px;">{cat_emoji}</span> {cat_name}
+      <span style="background-color: #eae7e0; color: #5c5a56; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: normal; margin-left: 6px;">{len(cat_products)} 款爆品</span>
+    </div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+{cards_html}
+  </div>
+</div>''')
+    contents_html = "\n\n".join(tab_contents)
 
     return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
     <!-- 行业标题 -->
@@ -1252,10 +1394,19 @@ def build_node_content(node, node_idx, is_first):
         <div style="font-size: 12px; color: #8c8985;">小店广告域 · TOP200 爆品</div>
       </div>
     </div>
-    <!-- 商品卡片网格 -->
-    <div style="max-width: 1200px; margin: 18px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
-      <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-{cards_html}
+    <!-- 类目分布看板 -->
+    <div style="max-width: 1200px; margin: 16px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+      <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
+        <h3 style="margin: 0 0 12px 0; font-size: 15px; color: {theme["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（按商品名关键词自动归类 · 点击卡片切换品类 ↓）</span></h3>
+        <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
+{dist_html}
+        </div>
+      </div>
+    </div>
+    <!-- 类目商品展示区 -->
+    <div style="max-width: 1200px; margin: 16px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+      <div class="category-content-box" style="background-color: #ffffff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px solid {theme["color_border"]}; min-height: 300px;">
+{contents_html}
       </div>
     </div>
   </div>'''
@@ -2217,6 +2368,52 @@ def build_versioned_html(versions, nodes):
           numEl.style.color = colorDeep;
         }}
         activeCard.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
+      }}
+    }}
+
+    // 小店类目切换（nodeKey 为小店行业 key，idx 为类目索引）
+    function switchNodeCategory(nodeKey, idx) {{
+      const container = document.getElementById('node-content-' + nodeKey);
+      if (!container) return;
+
+      const contents = container.querySelectorAll('.folder-content');
+      contents.forEach(c => {{
+        c.classList.remove('active', 'folder-show');
+        c.style.display = 'none';
+      }});
+
+      const target = document.getElementById('node-tab-content-' + nodeKey + '-' + idx);
+      if (target) {{
+        target.classList.add('folder-show');
+        target.style.display = 'block';
+      }}
+
+      const distCards = container.querySelectorAll('.dist-card');
+      distCards.forEach(card => {{
+        card.classList.remove('active-dist-card');
+        card.style.backgroundColor = '#faf9f5';
+        card.style.borderColor = '#eeebe3';
+        card.style.boxShadow = 'none';
+        const numEl = card.querySelector('.dist-card-num');
+        if (numEl) {{
+          numEl.style.color = card.getAttribute('data-color-text') || '#c0392b';
+        }}
+      }});
+
+      const activeCard = document.getElementById('node-tab-header-' + nodeKey + '-' + idx);
+      if (activeCard) {{
+        const colorDeep = activeCard.getAttribute('data-color-deep') || '#c0392b';
+        const colorBg = activeCard.getAttribute('data-color-bg') || '#faf9f5';
+        const shadow = activeCard.getAttribute('data-shadow') || 'rgba(192,57,43,0.15)';
+        activeCard.classList.add('active-dist-card');
+        activeCard.style.backgroundColor = colorBg;
+        activeCard.style.borderColor = colorDeep;
+        activeCard.style.borderWidth = '1.5px';
+        activeCard.style.boxShadow = '0 2px 8px ' + shadow;
+        const numEl = activeCard.querySelector('.dist-card-num');
+        if (numEl) {{
+          numEl.style.color = colorDeep;
+        }}
       }}
     }}
 
