@@ -1066,10 +1066,11 @@ def build_product_card(item, cat_emoji, colors):
         )
     elif item.get("video_cover") and _valid_url(video_link):
         # 小店无主图但有素材视频：用视频首帧作为封面（等效“素材截图”），加载失败时回退到 NO IMAGE 占位
+        # 注意：<video> 是可包含内容的元素，必须显式 </video> 闭合，否则 NO IMAGE div 会被浏览器解析为 video 的子节点，导致整个右侧文字区被吞进 video、不可见
         image_html = (
             f'<video src="{_esc(video_link)}" muted playsinline preload="metadata" loading="lazy" class="card-video" '
             f'style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; background: #000;" '
-            f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
+            f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';"></video>'
             f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
             f'<span style="font-size: 32px;">{cat_emoji}</span>'
             f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span>'
