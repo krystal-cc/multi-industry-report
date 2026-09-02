@@ -1272,7 +1272,7 @@ def build_node_panel(nodes):
   <div style="max-width: 1200px; margin: 20px auto; padding: 0 10px; box-sizing: border-box;">
     <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
       <div style="font-size: 64px; margin-bottom: 20px;">🎁</div>
-      <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #c0392b; font-weight: 600;">节点爆品即将上线</h3>
+      <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #c0392b; font-weight: 600;">小店广告域爆品即将上线</h3>
       <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">开学季、中秋节等营销节点爆品数据正在采集中</p>
     </div>
   </div>'''
@@ -2031,17 +2031,17 @@ def build_versioned_html(versions, nodes):
         <!-- 左侧：标题区 -->
         <div style="text-align: left; flex: 1 1 auto; min-width: 240px;">
           <h1 style="margin: 0; font-size: 21px; font-weight: 700; letter-spacing: 1px; color: #3d3527; line-height: 1.35;">
-            <span class="poster-title-sub" style="font-size: 34px; font-weight: 800; letter-spacing: 2.5px; background: linear-gradient(135deg, #3d3527 0%, #6b5a3e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">CID爆品榜单</span>
+            <span class="poster-title-sub" style="font-size: 34px; font-weight: 800; letter-spacing: 2.5px; background: linear-gradient(135deg, #3d3527 0%, #6b5a3e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">商品消费·爆品榜单</span>
           </h1>
           <div class="gold-line" style="margin: 12px 0 10px 0;"></div>
-          <div class="banner-tag" style="font-size: 13px; padding: 5px 14px;">覆盖4个行业 · 多个节点</div>
+          <div class="banner-tag" style="font-size: 13px; padding: 5px 14px;">覆盖4个行业 · 多条链路</div>
         </div>
         <!-- 右侧：意见反馈 + 一级 Tab（常规 / 节点） -->
         <div class="banner-actions" style="flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
           <a class="feedback-btn" href="{feedback_href}" target="_blank" rel="noopener noreferrer"{feedback_onclick}>💬 意见反馈</a>
           <div class="panel-tabs" style="margin: 0;">
-            <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 常规爆品</div>
-            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 节点爆品</div>
+            <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 CID全域爆品</div>
+            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 小店广告域爆品</div>
           </div>
         </div>
       </div>
