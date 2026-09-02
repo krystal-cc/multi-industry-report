@@ -23,6 +23,12 @@ FEEDBACK_URL = "https://wj.qq.com/s2/27695766/tw1l/"
 # sheets 为「行业名 -> sheet名匹配前缀」映射（新老数据的 sheet 命名不同）
 DATA_SOURCES = [
     {
+        "key": "0902",
+        "label": "9月2日更新",
+        "path": "/Users/krystalcao/Desktop/爆品数据0902.xlsx",
+        "sheets": {"消电日百": "消电日百", "食品饮料": "食品饮料", "美护": "美护", "服饰": "服饰"},
+    },
+    {
         "key": "0825",
         "label": "8月25日更新",
         "path": "/Users/krystalcao/Desktop/爆品榜单0825.xlsx",
