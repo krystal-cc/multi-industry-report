@@ -50,26 +50,15 @@ DATA_SOURCES = [
 
 # ================= 节点爆品 =================
 # 节点爆品：针对营销节点（开学季、中秋节等）的独立商品集合，每个节点一期数据（不保留历史版本）
-# 与常规爆品不同：节点爆品不按 4 行业分 sheet，而是每个节点一个 Excel（或 sheet），里面是平铺的商品列表
-# 商品列字段（与常规爆品对齐）：商品名称、商品主图、创意标题、引流平台、落地页URL、抖音视频链接、（可选）分类/投放二级行业
-# 当 path 为空或文件不存在时，该节点显示「数据待填充」占位，等数据到位后填入 path 重新运行即可
+# 小店广告域爆品：4 个一级行业，每个行业取「综合GMV(全部广告)」top200 商品
+# 与 CID 全域爆品不同：小店数据仅含 商品名/创意文案/素材视频/GMV，无主图、无引流平台、无落地页
+# 列字段：微信小店商品ID(翻译后)=商品名、创意文案(第一部分)=文案、素材URL(创意唯一)=视频、综合GMV(全部广告)(元)=GMV
+XIAODIAN_PATH = "/Users/krystalcao/Desktop/小店爆品数据0902_top200.xlsx"
 NODE_SOURCES = [
-    {
-        "key": "kaixue",          # 唯一标识（用于锚点/切换）
-        "label": "开学季",
-        "emoji": "🎒",
-        "color": "#e67e22",       # 节点主色（用于 Tab 高亮）
-        "path": "",               # 待填：节点爆品 Excel 路径
-        "sheet": None,            # 指定 sheet 名，None 表示读取第一个 sheet
-    },
-    {
-        "key": "zhongqiu",
-        "label": "中秋节",
-        "emoji": "🥮",
-        "color": "#d4a017",
-        "path": "",
-        "sheet": None,
-    },
+    {"key": "xd-xiaodianribai", "label": "消电日百", "path": XIAODIAN_PATH, "sheet": "消电日百"},
+    {"key": "xd-shipin",        "label": "食品饮料", "path": XIAODIAN_PATH, "sheet": "食品饮料"},
+    {"key": "xd-meihu",         "label": "美护",     "path": XIAODIAN_PATH, "sheet": "美护"},
+    {"key": "xd-fushi",         "label": "服饰",     "path": XIAODIAN_PATH, "sheet": "服饰"},
 ]
 
 # 节点爆品统一主题配色（节日暖色系，用于节点商品卡片）
@@ -246,54 +235,64 @@ def load_industries_data(source):
         industries_data.append(ind_data)
     return industries_data
 
+def format_gmv(val):
+    """把 GMV 数值格式化为紧凑中文金额（如 ¥12.3万 / ¥1.2亿）"""
+    if val is None or pd.isna(val):
+        return ""
+    try:
+        v = float(val)
+    except (TypeError, ValueError):
+        return ""
+    if v >= 100000000:
+        return f"¥{v/100000000:.2f}亿"
+    if v >= 10000:
+        return f"¥{v/10000:.1f}万"
+    return f"¥{v:,.0f}"
+
+
 def load_node_products(node_source):
-    """读取单个节点爆品的数据，返回平铺的商品列表；无数据返回 None
-    
-    节点爆品与常规爆品不同：不按 4 行业分 sheet，而是单个 Excel（或 sheet）里的独立商品列表。
-    列字段尽量兼容：商品名称、商品主图、创意标题、引流平台、落地页URL、抖音视频链接，
-    分类标签可选（优先"分类"列，其次"投放二级行业"列）。
+    """读取小店广告域爆品数据（4 行业各 top200），返回平铺商品列表；无数据返回 None
+
+    小店字段映射：商品名=微信小店商品ID(翻译后)、文案=创意文案(第一部分)、
+    视频=素材URL(创意唯一)、GMV=综合GMV(全部广告)(元)。
+    小店数据无商品主图、无引流平台、无落地页链接，均用占位处理。
     """
     path = node_source.get("path", "")
     if not path or not os.path.exists(path):
         return None
-    
+
     sheet = node_source.get("sheet")
     try:
-        if sheet:
-            df = pd.read_excel(path, sheet)
-        else:
-            df = pd.read_excel(path)  # 默认读取第一个 sheet
+        df = pd.read_excel(path, sheet_name=sheet if sheet else 0)
     except Exception:
         return None
-    
+
     if df.empty:
         return None
-    
+
     products = []
     for _, row in df.iterrows():
-        # 处理商品主图（NaN或空字符串都视为无图）
-        img = row.get("商品主图")
-        img_url = str(img) if pd.notna(img) and str(img).strip() and str(img) != "nan" else ""
-        # 处理商品名称
-        name = row.get("商品名称")
+        name = row.get("微信小店商品ID(翻译后)")
         name_str = str(name) if pd.notna(name) else ""
-        # 分类标签（可选）：优先"分类"列，其次"投放二级行业"列
-        tag_str = ""
-        for col in ("分类", "投放二级行业"):
-            if col in df.columns:
-                tv = row.get(col)
-                if tv is not None and pd.notna(tv) and str(tv).strip() and str(tv) != "nan":
-                    tag_str = str(tv).strip()
-                    break
-        
+
+        copy = row.get("创意文案(第一部分)")
+        copy_str = str(copy) if pd.notna(copy) else ""
+
+        video = row.get("素材URL(创意唯一)")
+        video_str = str(video) if pd.notna(video) and str(video).strip() and str(video) != "nan" else "#"
+
+        gmv = row.get("综合GMV(全部广告)(元)")
+        gmv_str = format_gmv(gmv)
+
         products.append({
             "name": name_str,
-            "image_url": img_url,
-            "tags": [tag_str] if tag_str else [],
-            "source": str(row.get("引流平台", "")) if pd.notna(row.get("引流平台")) else "",
-            "copy": str(row.get("创意标题", "")) if pd.notna(row.get("创意标题")) else "",
-            "video_link": str(row.get("抖音视频链接", "")) if pd.notna(row.get("抖音视频链接")) else "#",
-            "link": str(row.get("落地页URL", "")) if pd.notna(row.get("落地页URL")) else "#",
+            "image_url": "",          # 小店无主图 -> NO IMAGE 占位
+            "tags": [],
+            "source": "",             # 小店不标注 pdd/jd 平台
+            "copy": copy_str,
+            "video_link": video_str,
+            "link": "#",              # 小店无落地页 -> 直达链路显示“暂无相关数据”
+            "gmv": gmv_str,
         })
     return products
 
@@ -963,6 +962,7 @@ def build_product_card(item, cat_emoji, colors):
     image_url = item.get("image_url", "")
     tags = item.get("tags", [])
     source = item.get("source", "")
+    gmv = item.get("gmv", "")
     c_text = colors["color_text"]
     c_light = colors["color_light"]
     
@@ -993,7 +993,11 @@ def build_product_card(item, cat_emoji, colors):
         platform_type = "other"
         platform_label = ""
 
-    tags_html_parts = [platform_label] if platform_label else []
+    tags_html_parts = []
+    if gmv:
+        tags_html_parts.append(f'<span style="background-color: #eef5ef; color: #4a7c59; border: 1px solid #d8e8dc; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-right: 4px; font-weight: 700;">GMV {gmv}</span>')
+    if platform_label:
+        tags_html_parts.append(platform_label)
     for tag in tags:
         tags_html_parts.append(f'<span style="background-color: {c_light}; color: {c_text}; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-right: 4px; font-weight: 500;">{tag}</span>')
     tags_html = "".join(tags_html_parts)
@@ -1215,17 +1219,19 @@ def build_css_vars(color_config):
 
 
 def build_node_content(node, node_idx, is_first):
-    """生成单个节点爆品的内容区域（node 结构：key/label/emoji/color/products/total）"""
+    """生成单个小店广告域爆品行业的内容区域（node 结构：key/label/emoji/color/products/total）"""
     products = node.get("products", [])
     total = node.get("total", 0)
-    emoji = node.get("emoji", "🎁")
     label = node.get("label", "")
     key = node.get("key", "")
-    color = node.get("color", NODE_THEME["color"])
-    
+    # 行业主题色：label 为行业名时优先用 INDUSTRY_CONFIG，否则回退 NODE_THEME
+    theme = INDUSTRY_CONFIG.get(label, NODE_THEME)
+    emoji = node.get("emoji", theme.get("emoji", "🎁"))
+    color = theme.get("color", node.get("color", NODE_THEME["color"]))
+
     active_cls = 'active' if is_first else ''
-    css_vars = build_css_vars(NODE_THEME)
-    
+    css_vars = build_css_vars(theme)
+
     # 无数据 -> 占位
     if not products:
         return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
@@ -1234,26 +1240,26 @@ def build_node_content(node, node_idx, is_first):
       <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
         <div style="font-size: 64px; margin-bottom: 20px;">{emoji}</div>
         <h3 style="margin: 0 0 10px 0; font-size: 18px; color: {color}; font-weight: 600;">{label} 爆品数据待填充</h3>
-        <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">节点数据到位后自动填充，敬请期待</p>
+        <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">数据到位后自动填充，敬请期待</p>
       </div>
     </div>
   </div>'''
-    
+
     # 有数据 -> 商品卡片平铺
     cards = []
     for item in products:
-        cards.append(build_product_card(item, emoji, NODE_THEME))
+        cards.append(build_product_card(item, emoji, theme))
     cards_html = "\n".join(cards)
-    
+
     return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
-    <!-- 节点标题 -->
+    <!-- 行业标题 -->
     <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
       <div style="display: flex; align-items: center; justify-content: space-between; background-color: #ffffff; border-radius: 12px; padding: 16px 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0; border-left: 4px solid {color};">
         <div style="font-size: 20px; font-weight: bold; color: #2d2a26; display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 26px;">{emoji}</span> {label}
-          <span style="background-color: {NODE_THEME["color_light"]}; color: {NODE_THEME["color_text"]}; font-size: 12px; padding: 2px 12px; border-radius: 12px; font-weight: bold; margin-left: 6px;">{total} 款爆品</span>
+          <span style="background-color: {theme["color_light"]}; color: {theme["color_text"]}; font-size: 12px; padding: 2px 12px; border-radius: 12px; font-weight: bold; margin-left: 6px;">{total} 款爆品</span>
         </div>
-        <div style="font-size: 12px; color: #8c8985;">节点限定 · 一期数据</div>
+        <div style="font-size: 12px; color: #8c8985;">小店广告域 · 综合GMV TOP200</div>
       </div>
     </div>
     <!-- 商品卡片网格 -->
@@ -2282,22 +2288,23 @@ def main():
             "html": html,
         })
     
-    # 读取节点爆品数据
+    # 读取小店广告域爆品数据（4 行业各 top200）
     nodes = []
     for node_src in NODE_SOURCES:
         products = load_node_products(node_src)
+        cfg = INDUSTRY_CONFIG.get(node_src["label"], {})
         nodes.append({
             "key": node_src["key"],
             "label": node_src["label"],
-            "emoji": node_src.get("emoji", "🎁"),
-            "color": node_src.get("color", NODE_THEME["color"]),
+            "emoji": node_src.get("emoji", cfg.get("emoji", "🎁")),
+            "color": node_src.get("color", cfg.get("color", NODE_THEME["color"])),
             "products": products or [],
             "total": len(products) if products else 0,
         })
         if products:
-            print(f"  节点[{node_src['label']}]: {len(products)}款爆品")
+            print(f"  小店广告域[{node_src['label']}]: {len(products)}款爆品")
         else:
-            print(f"  节点[{node_src['label']}]: 无数据（占位）")
+            print(f"  小店广告域[{node_src['label']}]: 无数据（占位）")
     
     output_dir = "/Users/krystalcao/Desktop/已完成"
     os.makedirs(output_dir, exist_ok=True)
