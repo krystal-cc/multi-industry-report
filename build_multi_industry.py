@@ -235,21 +235,6 @@ def load_industries_data(source):
         industries_data.append(ind_data)
     return industries_data
 
-def format_gmv(val):
-    """把 GMV 数值格式化为紧凑中文金额（如 ¥12.3万 / ¥1.2亿）"""
-    if val is None or pd.isna(val):
-        return ""
-    try:
-        v = float(val)
-    except (TypeError, ValueError):
-        return ""
-    if v >= 100000000:
-        return f"¥{v/100000000:.2f}亿"
-    if v >= 10000:
-        return f"¥{v/10000:.1f}万"
-    return f"¥{v:,.0f}"
-
-
 def load_node_products(node_source):
     """读取小店广告域爆品数据（4 行业各 top200），返回平铺商品列表；无数据返回 None
 
@@ -281,18 +266,15 @@ def load_node_products(node_source):
         video = row.get("素材URL(创意唯一)")
         video_str = str(video) if pd.notna(video) and str(video).strip() and str(video) != "nan" else "#"
 
-        gmv = row.get("综合GMV(全部广告)(元)")
-        gmv_str = format_gmv(gmv)
-
         products.append({
             "name": name_str,
-            "image_url": "",          # 小店无主图 -> NO IMAGE 占位
+            "image_url": "",          # 小店无主图 -> 用素材视频首帧代替
             "tags": [],
             "source": "",             # 小店不标注 pdd/jd 平台
             "copy": copy_str,
             "video_link": video_str,
             "link": "#",              # 小店无落地页 -> 直达链路显示“暂无相关数据”
-            "gmv": gmv_str,
+            "video_cover": True,      # 标记：主图位用素材视频首帧填充（仅小店）
         })
     return products
 
@@ -962,16 +944,34 @@ def build_product_card(item, cat_emoji, colors):
     image_url = item.get("image_url", "")
     tags = item.get("tags", [])
     source = item.get("source", "")
-    gmv = item.get("gmv", "")
     c_text = colors["color_text"]
     c_light = colors["color_light"]
-    
+
+    # 链接有效性判断：缺失或占位符时视为无链接
+    def _valid_url(u):
+        s = str(u).strip() if u is not None else ""
+        return s not in ("", "#", "nan", "None", "null", "-", "暂无")
+
+    def _esc(u):
+        return str(u).replace('&', '&amp;').replace('"', '&quot;')
+
     if image_url:
         # onerror 时把 img 隐藏，同时显示后面预置的 NO IMAGE 占位 div（高度自适应右侧总高度）
         # 图片支持点击放大：cursor: zoom-in + onclick 触发 showImageModal
         image_html = (
             f'<img src="{image_url}" alt="商品主图" class="card-image" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; cursor: zoom-in;" '
             f'onclick="showImageModal(this.src, event)" '
+            f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
+            f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
+            f'<span style="font-size: 32px;">{cat_emoji}</span>'
+            f'<span style="font-size: 10px; font-weight: bold; margin-top: 6px; opacity: 0.7;">NO IMAGE</span>'
+            f'</div>'
+        )
+    elif item.get("video_cover") and _valid_url(video_link):
+        # 小店无主图但有素材视频：用视频首帧作为封面（等效“素材截图”），加载失败时回退到 NO IMAGE 占位
+        image_html = (
+            f'<video src="{_esc(video_link)}" muted playsinline preload="metadata" loading="lazy" class="card-video" '
+            f'style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; object-fit: cover; border: 1px solid #edebe5; background: #000;" '
             f'onerror="this.onerror=null;this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';">'
             f'<div class="card-noimage" style="width: 150px; height: 150px; flex-shrink: 0; border-radius: 8px; background: linear-gradient(135deg, var(--ind-light) 0%, var(--ind-border) 100%); display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--ind-color);">'
             f'<span style="font-size: 32px;">{cat_emoji}</span>'
@@ -994,8 +994,6 @@ def build_product_card(item, cat_emoji, colors):
         platform_label = ""
 
     tags_html_parts = []
-    if gmv:
-        tags_html_parts.append(f'<span style="background-color: #eef5ef; color: #4a7c59; border: 1px solid #d8e8dc; font-size: 10px; padding: 1px 7px; border-radius: 4px; margin-right: 4px; font-weight: 700;">GMV {gmv}</span>')
     if platform_label:
         tags_html_parts.append(platform_label)
     for tag in tags:
@@ -1004,14 +1002,6 @@ def build_product_card(item, cat_emoji, colors):
     
     name_escaped = name.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
     copy_escaped = copy_text.replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
-
-    # 链接有效性判断：缺失或占位符时显示“暂无相关数据”
-    def _valid_url(u):
-        s = str(u).strip() if u is not None else ""
-        return s not in ("", "#", "nan", "None", "null", "-", "暂无")
-
-    def _esc(u):
-        return str(u).replace('&', '&amp;').replace('"', '&quot;')
 
     if _valid_url(video_link):
         video_btn = f'<a href="{_esc(video_link)}" target="_blank" rel="noopener" class="btn-visit btn-video"><span class="btn-emoji">🎬</span> 播放视频</a>'
@@ -1259,7 +1249,7 @@ def build_node_content(node, node_idx, is_first):
           <span style="font-size: 26px;">{emoji}</span> {label}
           <span style="background-color: {theme["color_light"]}; color: {theme["color_text"]}; font-size: 12px; padding: 2px 12px; border-radius: 12px; font-weight: bold; margin-left: 6px;">{total} 款爆品</span>
         </div>
-        <div style="font-size: 12px; color: #8c8985;">小店广告域 · 综合GMV TOP200</div>
+        <div style="font-size: 12px; color: #8c8985;">小店广告域 · TOP200 爆品</div>
       </div>
     </div>
     <!-- 商品卡片网格 -->
