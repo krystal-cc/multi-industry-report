@@ -1468,12 +1468,10 @@ def build_node_panel(node_versions):
         display = 'block' if v_i == 0 else 'none'
         version_blocks.append(f'''  <!-- NODE_VERSION_START: {ver["label"]} -->
   <div id="node-version-{vkey}" data-label="{ver["label"]}" class="node-version-block" style="display: {display}; width: 100%;">
-    <!-- 行业级 Tab 切换 + 日期下拉（与 CID 全域爆品同款） -->
+    <!-- 行业级 Tab 切换 + 日期下拉（与 CID 全域爆品同款：日期紧跟最后一个 Tab） -->
     <div style="max-width: 1200px; margin: 0 auto; padding: 0 10px;" class="industry-content-wrapper">
-      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-        <div class="flex items-end overflow-x-auto no-scrollbar gap-2 pl-2 select-none" id="node-tabs-container-{vkey}" style="flex: 1 1 auto; min-width: 0;">
+      <div class="flex items-end overflow-x-auto no-scrollbar gap-2 pl-2 select-none" id="node-tabs-container-{vkey}" style="flex: 1 1 auto; min-width: 0;">
 {node_tabs_html}
-        </div>
         {date_select_html}
       </div>
     </div>
