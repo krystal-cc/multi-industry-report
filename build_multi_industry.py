@@ -54,11 +54,16 @@ DATA_SOURCES = [
 # 与 CID 全域爆品不同：小店数据仅含 商品名/创意文案/素材视频/GMV，无主图、无引流平台、无落地页
 # 列字段：微信小店商品ID(翻译后)=商品名、创意文案(第一部分)=文案、素材URL(创意唯一)=视频、综合GMV(全部广告)(元)=GMV
 XIAODIAN_PATH = "/Users/krystalcao/Desktop/小店爆品数据0902_top200.xlsx"
-NODE_SOURCES = [
-    {"key": "xd-xiaodianribai", "label": "消电日百", "path": XIAODIAN_PATH, "sheet": "消电日百"},
-    {"key": "xd-shipin",        "label": "食品饮料", "path": XIAODIAN_PATH, "sheet": "食品饮料"},
-    {"key": "xd-meihu",         "label": "美护",     "path": XIAODIAN_PATH, "sheet": "美护"},
-    {"key": "xd-fushi",         "label": "服饰",     "path": XIAODIAN_PATH, "sheet": "服饰"},
+# 小店爆品的「行业分表」定义（各版本共用同一套行业，仅数据文件不同）
+NODE_SHEETS = [
+    {"label": "消电日百", "sheet": "消电日百"},
+    {"label": "食品饮料", "sheet": "食品饮料"},
+    {"label": "美护",     "sheet": "美护"},
+    {"label": "服饰",     "sheet": "服饰"},
+]
+# 小店爆品的日期版本（与 CID 一样支持多期数据，新增一期在此追加即可，第一个为默认展示）
+NODE_VERSIONS = [
+    {"key": "xd0902", "label": "9月2日更新", "path": XIAODIAN_PATH},
 ]
 
 # 节点爆品统一主题配色（节日暖色系，用于节点商品卡片）
@@ -1306,12 +1311,13 @@ def build_css_vars(color_config):
     )
 
 
-def build_node_content(node, node_idx, is_first):
-    """生成单个小店广告域爆品行业的内容区域（node 结构：key/label/emoji/color/products/total）"""
+def build_node_content(node, ckey, is_first):
+    """生成单个小店广告域爆品行业的内容区域
+    ckey: 复合 DOM key = "{版本key}-{行业索引}"，用于隔离不同日期版本的 DOM id"""
     products = node.get("products", [])
     total = node.get("total", 0)
     label = node.get("label", "")
-    key = node.get("key", "")
+    key = ckey
     # 行业主题色：label 为行业名时优先用 INDUSTRY_CONFIG，否则回退 NODE_THEME
     theme = INDUSTRY_CONFIG.get(label, NODE_THEME)
     emoji = node.get("emoji", theme.get("emoji", "🎁"))
@@ -1387,7 +1393,7 @@ def build_node_content(node, node_idx, is_first):
     return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
     <!-- 行业 banner 已按用户要求移除 -->
     <!-- 类目分布看板 -->
-    <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+    <div style="max-width: 1200px; margin: 16px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
       <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
         <h3 style="margin: 0 0 12px 0; font-size: 15px; color: {theme["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（按商品名关键词自动归类 · 点击卡片切换品类 ↓）</span></h3>
         <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
@@ -1404,9 +1410,11 @@ def build_node_content(node, node_idx, is_first):
   </div>'''
 
 
-def build_node_panel(nodes):
-    """生成节点爆品板块（节点 Tab + 节点内容）；nodes 为空时返回占位提示"""
-    if not nodes:
+def build_node_panel(node_versions):
+    """生成小店广告域爆品板块（日期版本块 + 行业 Tab + 行业内容）
+    node_versions: [{"key", "label", "nodes": [...]}, ...]，第一个为默认展示
+    行业 Tab 与日期下拉的结构/样式与 CID 全域爆品完全一致。"""
+    if not node_versions or not any(v.get("nodes") for v in node_versions):
         return '''  <!-- 节点爆品空状态 -->
   <div style="max-width: 1200px; margin: 20px auto; padding: 0 10px; box-sizing: border-box;">
     <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
@@ -1415,30 +1423,66 @@ def build_node_panel(nodes):
       <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">开学季、中秋节等营销节点爆品数据正在采集中</p>
     </div>
   </div>'''
-    
-    # 节点 Tab
-    node_tabs = []
-    for idx, node in enumerate(nodes):
-        cls = 'active-node-tab' if idx == 0 else ''
-        node_tabs.append(f'''    <div id="node-tab-{node["key"]}" onclick="switchNode('{node["key"]}', {idx})" class="node-tab {cls}" style="--node-color: {node.get("color", NODE_THEME["color"])};">
-      <span>{node["emoji"]}</span> {node["label"]}
-    </div>''')
-    node_tabs_html = "\n".join(node_tabs)
-    
-    # 节点内容
-    node_contents = []
-    for idx, node in enumerate(nodes):
-        node_contents.append(build_node_content(node, idx, idx == 0))
-    node_contents_html = "\n\n".join(node_contents)
-    
-    return f'''  <!-- 节点 Tab 栏 -->
-  <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
-    <div class="node-tabs-mobile" style="display: flex; flex-wrap: wrap; gap: 10px; background-color: #ffffff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
-{node_tabs_html}
-    </div>
-  </div>
 
-{node_contents_html}'''
+    # 日期版本下拉选项（每个版本块内都放一份完整选项，选中态各自不同）
+    all_options = [(v["key"], v["label"]) for v in node_versions]
+
+    version_blocks = []
+    for v_i, ver in enumerate(node_versions):
+        vkey = ver["key"]
+        nodes = ver.get("nodes", [])
+
+        # 行业 Tab（与 CID 同款：industry-tab / active-industry-tab）
+        node_tabs = []
+        for idx, node in enumerate(nodes):
+            theme = INDUSTRY_CONFIG.get(node["label"], NODE_THEME)
+            cls = 'active-industry-tab' if idx == 0 else ''
+            node_tabs.append(
+                f'''      <div id="node-tab-{vkey}-{idx}" onclick="switchNode('{vkey}', {idx})" style="--tab-color: {theme["color_text"]}; --tab-color-deep: {theme["color_deep"]};" class="industry-tab px-6 py-3 text-sm md:text-base font-black flex items-center gap-2 cursor-pointer select-none transition-all duration-300 {cls}">
+        <span>{node["emoji"]}</span> {node["label"]}
+      </div>'''
+            )
+        node_tabs_html = "\n".join(node_tabs)
+
+        # 日期下拉（样式与 CID 的 version-selector 一致）
+        options_html = "\n".join(
+            f'          <option value="{k}"{" selected" if k == vkey else ""}>{lab}</option>'
+            for k, lab in all_options
+        )
+        date_select_html = (
+            '<div class="version-selector" style="flex: 0 0 auto;">\n'
+            f'        <select id="node-version-select-{vkey}" onchange="switchNodeVersion(this.value)" '
+            'style="appearance: none; -webkit-appearance: none; background: #ffffff; border: 1.5px solid #c9b88f; border-radius: 10px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 600; color: #5a5347; cursor: pointer; '
+            "background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9b88f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;); "
+            'background-repeat: no-repeat; background-position: right 12px center; outline: none; min-width: 160px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(120,110,80,0.12);">\n'
+            f'{options_html}\n'
+            '        </select>\n'
+            '      </div>'
+        )
+
+        # 行业内容
+        node_contents = "\n\n".join(
+            build_node_content(node, f"{vkey}-{idx}", idx == 0) for idx, node in enumerate(nodes)
+        )
+
+        display = 'block' if v_i == 0 else 'none'
+        version_blocks.append(f'''  <!-- NODE_VERSION_START: {ver["label"]} -->
+  <div id="node-version-{vkey}" data-label="{ver["label"]}" class="node-version-block" style="display: {display}; width: 100%;">
+    <!-- 行业级 Tab 切换 + 日期下拉（与 CID 全域爆品同款） -->
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 10px;" class="industry-content-wrapper">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+        <div class="flex items-end overflow-x-auto no-scrollbar gap-2 pl-2 select-none" id="node-tabs-container-{vkey}" style="flex: 1 1 auto; min-width: 0;">
+{node_tabs_html}
+        </div>
+        {date_select_html}
+      </div>
+    </div>
+
+{node_contents}
+  </div>
+  <!-- NODE_VERSION_END -->''')
+
+    return "\n".join(version_blocks)
 
 
 def inject_date_filter_into_industry_row(body, version_key, version_options):
@@ -1490,13 +1534,13 @@ def inject_date_filter_into_industry_row(body, version_key, version_options):
     return new_body
 
 
-def build_versioned_html(versions, nodes):
-    """将所有数据源版本 + 节点爆品合并为最终HTML（顶层「常规爆品/节点爆品」Tab 切换）
+def build_versioned_html(versions, node_versions):
+    """将所有数据源版本 + 小店广告域爆品合并为最终HTML（顶层「CID全域爆品/小店广告域爆品」Tab 切换）
     versions: [{"key", "label", "industries_data", "html"}, ...]，第一个为默认显示
-    nodes: [{"key", "label", "emoji", "color", "products", "total"}, ...]，节点爆品列表（可为空）"""
+    node_versions: [{"key", "label", "nodes": [...]}, ...]，小店爆品的日期版本列表（可为空）"""
     
-    # 节点爆品板块（节点 Tab + 节点内容）
-    node_panel_html = build_node_panel(nodes)
+    # 小店广告域爆品板块（日期版本块 + 行业 Tab + 内容）
+    node_panel_html = build_node_panel(node_versions)
     
     # 构建版本选择器选项 + 各版本内容块（剔除各自顶部海报框）
     version_options = []
@@ -2234,20 +2278,42 @@ def build_versioned_html(versions, nodes):
       }}
     }}
 
-    // 节点切换
-    function switchNode(nodeKey, idx) {{
-      document.querySelectorAll('.node-content').forEach(c => {{
-        c.classList.remove('active');
-        c.style.display = 'none';
-      }});
-      document.querySelectorAll('.node-tab').forEach(t => t.classList.remove('active-node-tab'));
-      const target = document.getElementById('node-content-' + nodeKey);
+    // 小店行业切换（vk 为小店日期版本 key，idx 为行业索引）
+    function switchNode(vk, idx) {{
+      const block = document.getElementById('node-version-' + vk);
+      if (block) {{
+        block.querySelectorAll('.node-content').forEach(c => {{
+          c.classList.remove('active');
+          c.style.display = 'none';
+        }});
+        block.querySelectorAll('.industry-tab').forEach(t => t.classList.remove('active-industry-tab'));
+      }}
+      const target = document.getElementById('node-content-' + vk + '-' + idx);
       if (target) {{
         target.classList.add('active');
         target.style.display = 'block';
+        // 切换行业时重置该行业的类目选中态为第一个
+        switchNodeCategory(vk + '-' + idx, 0);
       }}
-      const activeTab = document.getElementById('node-tab-' + nodeKey);
-      if (activeTab) activeTab.classList.add('active-node-tab');
+      const activeTab = document.getElementById('node-tab-' + vk + '-' + idx);
+      if (activeTab) {{
+        activeTab.classList.add('active-industry-tab');
+        activeTab.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
+      }}
+    }}
+
+    // 小店日期版本切换
+    function switchNodeVersion(key) {{
+      document.querySelectorAll('.node-version-block').forEach(b => b.style.display = 'none');
+      const target = document.getElementById('node-version-' + key);
+      if (!target) return;
+      target.style.display = 'block';
+
+      // 同步所有小店日期下拉框的显示文字
+      document.querySelectorAll('select[id^="node-version-select-"]').forEach(s => {{ s.value = key; }});
+
+      // 激活该版本的第一个行业
+      switchNode(key, 0);
     }}
 
     // 版本切换
@@ -2269,12 +2335,12 @@ def build_versioned_html(versions, nodes):
       if (totalEl && totalVal) totalEl.textContent = totalVal;
       if (countEl && countVal) countEl.textContent = countVal;
 
-      // 重置所有版本块内的 industry tab/content 激活态
-      document.querySelectorAll('.industry-content').forEach(c => {{
+      // 重置所有 CID 版本块内的 industry tab/content 激活态（不影响小店板块的 industry-tab）
+      document.querySelectorAll('.version-block .industry-content').forEach(c => {{
         c.classList.remove('active');
         c.style.display = 'none';
       }});
-      document.querySelectorAll('.industry-tab').forEach(t => t.classList.remove('active-industry-tab'));
+      document.querySelectorAll('.version-block .industry-tab').forEach(t => t.classList.remove('active-industry-tab'));
 
       // 激活新版本第一个 industry tab + content
       const firstTab = document.getElementById('industry-tab-' + key + '-0');
@@ -2467,30 +2533,34 @@ def main():
             "html": html,
         })
     
-    # 读取小店广告域爆品数据（4 行业各 top200）
-    nodes = []
-    for node_src in NODE_SOURCES:
-        products = load_node_products(node_src)
-        cfg = INDUSTRY_CONFIG.get(node_src["label"], {})
-        nodes.append({
-            "key": node_src["key"],
-            "label": node_src["label"],
-            "emoji": node_src.get("emoji", cfg.get("emoji", "🎁")),
-            "color": node_src.get("color", cfg.get("color", NODE_THEME["color"])),
-            "products": products or [],
-            "total": len(products) if products else 0,
-        })
-        if products:
-            print(f"  小店广告域[{node_src['label']}]: {len(products)}款爆品")
-        else:
-            print(f"  小店广告域[{node_src['label']}]: 无数据（占位）")
+    # 读取小店广告域爆品数据（按日期版本 × 4 行业各 top200）
+    node_versions = []
+    for ver in NODE_VERSIONS:
+        print(f"  处理小店版本: {ver['label']} [{ver['key']}]")
+        nodes = []
+        for sheet_cfg in NODE_SHEETS:
+            node_src = {"label": sheet_cfg["label"], "sheet": sheet_cfg["sheet"], "path": ver["path"]}
+            products = load_node_products(node_src)
+            cfg = INDUSTRY_CONFIG.get(sheet_cfg["label"], {})
+            nodes.append({
+                "label": sheet_cfg["label"],
+                "emoji": cfg.get("emoji", "🎁"),
+                "color": cfg.get("color", NODE_THEME["color"]),
+                "products": products or [],
+                "total": len(products) if products else 0,
+            })
+            if products:
+                print(f"    小店[{sheet_cfg['label']}]: {len(products)}款爆品")
+            else:
+                print(f"    小店[{sheet_cfg['label']}]: 无数据（占位）")
+        node_versions.append({"key": ver["key"], "label": ver["label"], "nodes": nodes})
     
     output_dir = "/Users/krystalcao/Desktop/已完成"
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "多行业爆品选品报告.html")
     
     print("🔨 生成HTML...")
-    final_html = build_versioned_html(versions, nodes)
+    final_html = build_versioned_html(versions, node_versions)
     
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(final_html)
