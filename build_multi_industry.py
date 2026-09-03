@@ -1385,18 +1385,9 @@ def build_node_content(node, node_idx, is_first):
     contents_html = "\n\n".join(tab_contents)
 
     return f'''  <div id="node-content-{key}" class="node-content {active_cls}" style="{css_vars}">
-    <!-- 行业标题 -->
-    <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
-      <div style="display: flex; align-items: center; justify-content: space-between; background-color: #ffffff; border-radius: 12px; padding: 16px 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0; border-left: 4px solid {color};">
-        <div style="font-size: 20px; font-weight: bold; color: #2d2a26; display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 26px;">{emoji}</span> {label}
-          <span style="background-color: {theme["color_light"]}; color: {theme["color_text"]}; font-size: 12px; padding: 2px 12px; border-radius: 12px; font-weight: bold; margin-left: 6px;">{total} 款爆品</span>
-        </div>
-        <div style="font-size: 12px; color: #8c8985;">小店广告域 · TOP200 爆品</div>
-      </div>
-    </div>
+    <!-- 行业 banner 已按用户要求移除 -->
     <!-- 类目分布看板 -->
-    <div style="max-width: 1200px; margin: 16px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
+    <div style="max-width: 1200px; margin: 25px auto 0 auto; padding: 0 10px; box-sizing: border-box;">
       <div style="background-color: #ffffff; border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e9e7e0;">
         <h3 style="margin: 0 0 12px 0; font-size: 15px; color: {theme["color_text"]}; font-weight: 700; display: flex; align-items: center; gap: 6px;">📊 爆品类目分布看板 <span style="font-size: 11px; color: #9c9995; font-weight: normal; margin-left: 6px;">（按商品名关键词自动归类 · 点击卡片切换品类 ↓）</span></h3>
         <div class="dist-board-mobile" style="display: flex; flex-wrap: wrap; gap: 10px;">
