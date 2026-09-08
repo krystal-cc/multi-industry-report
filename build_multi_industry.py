@@ -25,7 +25,7 @@ DATA_SOURCES = [
     {
         "key": "0902",
         "label": "9月2日更新",
-        "path": "/Users/krystalcao/Desktop/爆品数据0902.xlsx",
+        "path": "/Users/krystalcao/Desktop/爆品榜单/爆品数据0902.xlsx",
         "sheets": {"消电日百": "消电日百", "食品饮料": "食品饮料", "美护": "美护", "服饰": "服饰"},
     },
     {
@@ -50,10 +50,10 @@ DATA_SOURCES = [
 
 # ================= 节点爆品 =================
 # 节点爆品：针对营销节点（开学季、中秋节等）的独立商品集合，每个节点一期数据（不保留历史版本）
-# 小店广告域爆品：4 个一级行业，每个行业取「综合GMV(全部广告)」top200 商品
+# 小店投放域爆品：4 个一级行业，每个行业取「综合GMV(全部广告)」top200 商品
 # 与 CID 全域爆品不同：小店数据仅含 商品名/创意文案/素材视频/GMV，无主图、无引流平台、无落地页
 # 列字段：微信小店商品ID(翻译后)=商品名、创意文案(第一部分)=文案、素材URL(创意唯一)=视频、综合GMV(全部广告)(元)=GMV
-XIAODIAN_PATH = "/Users/krystalcao/Desktop/小店爆品数据0902_top200.xlsx"
+XIAODIAN_PATH = "/Users/krystalcao/Desktop/爆品榜单/小店爆品数据0902_top200.xlsx"
 # 小店爆品的「行业分表」定义（各版本共用同一套行业，仅数据文件不同）
 NODE_SHEETS = [
     {"label": "消电日百", "sheet": "消电日百"},
@@ -335,7 +335,7 @@ def load_industries_data(source):
     return industries_data
 
 def load_node_products(node_source):
-    """读取小店广告域爆品数据（4 行业各 top200），返回平铺商品列表；无数据返回 None
+    """读取小店投放域爆品数据（4 行业各 top200），返回平铺商品列表；无数据返回 None
 
     小店字段映射：商品名=微信小店商品ID(翻译后)、文案=创意文案(第一部分)、
     视频=素材URL(创意唯一)、GMV=综合GMV(全部广告)(元)。
@@ -1312,7 +1312,7 @@ def build_css_vars(color_config):
 
 
 def build_node_content(node, ckey, is_first):
-    """生成单个小店广告域爆品行业的内容区域
+    """生成单个小店投放域爆品行业的内容区域
     ckey: 复合 DOM key = "{版本key}-{行业索引}"，用于隔离不同日期版本的 DOM id"""
     products = node.get("products", [])
     total = node.get("total", 0)
@@ -1411,7 +1411,7 @@ def build_node_content(node, ckey, is_first):
 
 
 def build_node_panel(node_versions):
-    """生成小店广告域爆品板块（日期版本块 + 行业 Tab + 行业内容）
+    """生成小店投放域爆品板块（日期版本块 + 行业 Tab + 行业内容）
     node_versions: [{"key", "label", "nodes": [...]}, ...]，第一个为默认展示
     行业 Tab 与日期下拉的结构/样式与 CID 全域爆品完全一致。"""
     if not node_versions or not any(v.get("nodes") for v in node_versions):
@@ -1419,7 +1419,7 @@ def build_node_panel(node_versions):
   <div style="max-width: 1200px; margin: 20px auto; padding: 0 10px; box-sizing: border-box;">
     <div style="background-color: #ffffff; border-radius: 14px; padding: 60px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 2px dashed #e9e7e0;">
       <div style="font-size: 64px; margin-bottom: 20px;">🎁</div>
-      <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #c0392b; font-weight: 600;">小店广告域爆品即将上线</h3>
+      <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #c0392b; font-weight: 600;">小店投放域爆品即将上线</h3>
       <p style="margin: 0; font-size: 13px; color: #9c9995; line-height: 1.8;">开学季、中秋节等营销节点爆品数据正在采集中</p>
     </div>
   </div>'''
@@ -1533,11 +1533,11 @@ def inject_date_filter_into_industry_row(body, version_key, version_options):
 
 
 def build_versioned_html(versions, node_versions):
-    """将所有数据源版本 + 小店广告域爆品合并为最终HTML（顶层「CID全域爆品/小店广告域爆品」Tab 切换）
+    """将所有数据源版本 + 小店投放域爆品合并为最终HTML（顶层「CID全域爆品/小店投放域爆品」Tab 切换）
     versions: [{"key", "label", "industries_data", "html"}, ...]，第一个为默认显示
     node_versions: [{"key", "label", "nodes": [...]}, ...]，小店爆品的日期版本列表（可为空）"""
     
-    # 小店广告域爆品板块（日期版本块 + 行业 Tab + 内容）
+    # 小店投放域爆品板块（日期版本块 + 行业 Tab + 内容）
     node_panel_html = build_node_panel(node_versions)
     
     # 构建版本选择器选项 + 各版本内容块（剔除各自顶部海报框）
@@ -2222,7 +2222,7 @@ def build_versioned_html(versions, node_versions):
           <a class="feedback-btn" href="{feedback_href}" target="_blank" rel="noopener noreferrer"{feedback_onclick}>💬 意见反馈</a>
           <div class="panel-tabs" style="margin: 0;">
             <div id="panel-tab-regular" onclick="switchPanel('regular')" class="panel-tab active-panel-tab">🛒 CID全域爆品</div>
-            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 小店广告域爆品</div>
+            <div id="panel-tab-node" onclick="switchPanel('node')" class="panel-tab">🎁 小店投放域爆品</div>
           </div>
         </div>
       </div>
@@ -2531,7 +2531,7 @@ def main():
             "html": html,
         })
     
-    # 读取小店广告域爆品数据（按日期版本 × 4 行业各 top200）
+    # 读取小店投放域爆品数据（按日期版本 × 4 行业各 top200）
     node_versions = []
     for ver in NODE_VERSIONS:
         print(f"  处理小店版本: {ver['label']} [{ver['key']}]")
